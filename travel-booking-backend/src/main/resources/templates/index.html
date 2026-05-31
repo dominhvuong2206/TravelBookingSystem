@@ -1,0 +1,43 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Trang chủ</title>
+    <th:block th:replace="base :: css"></th:block>
+</head>
+<body>
+    <div th:replace="base :: header"></div>
+
+    <section class="container">
+        <div  class="mt-2">
+            <a th:href="@{/admin/products}" class="btn btn-info">Thêm sản phẩm</a>
+        </div>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Tên sản phẩm</th>
+                    <th>Gía bán</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="p: ${products}">
+                    <td>
+                        <img th:src="${p.image}" width="200" />
+                    </td>
+                    <td th:text="${p.name}"></td>
+                    <td th:text="${p.price} + 'VNĐ'"></td>
+                    <td>
+                        <a th:href="@{/admin/products/} + ${p.id}" class="btn btn-info">Cập nhật</a>
+                        <button class="btn btn-danger" th:onclick="'deleteProduct(\'' + @{/api/products/} + ${p.id} + '\')'">Xóa</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <div th:replace="base :: footer"></div>
+    <script th:src="@{/js/script.js}"></script>
+</body>
+</html>

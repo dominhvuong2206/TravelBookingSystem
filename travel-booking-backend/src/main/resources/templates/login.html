@@ -1,28 +1,30 @@
-<!doctype html>
+﻿<!doctype html>
 <html xmlns:th="http://www.thymeleaf.org">
     <head>
+        <meta charset="UTF-8" />
         <title>Đăng nhập</title>
-    <th:block th:replace="base :: css"></th:block>
-</head>
-<body>
-    <div th:replace="base :: header"></div>
+        <th:block th:replace="base :: css"></th:block>
+    </head>
+    <body>
+        <div th:replace="base :: header"></div>
 
-    <section class="container">
-        <form method="post" th:action="@{/login}">
-            <div class="form-floating mb-3 mt-3">
-                <input type="text" class="form-control" id="username" placeholder="Tên đăng nhập" name="username" />
-                <label for="username">Tên đăng nhập</label>
-            </div>
-            <div class="form-floating mb-3 mt-3">
-                <input type="password" class="form-control" id="password" placeholder="Mật khẩu" name="password" />
-                <label for="username">Mật khẩu</label>
-            </div>
-            <div class="form-floating mb-3 mt-3">
-                <button class="btn btn-success">Đăng nhập</button>
-            </div>
-        </form>
-    </section>
+        <section class="container">
+            <h1 class="text-center text-success mt-3">Đăng nhập quản trị</h1>
+            <form method="post" th:action="@{/login}">
+                <div class="form-floating mb-3 mt-3">
+                    <input type="text" class="form-control" id="username" placeholder="Tên đăng nhập" name="username" />
+                    <label for="username">Tên đăng nhập</label>
+                </div>
+                <div class="form-floating mb-3 mt-3">
+                    <input type="password" class="form-control" id="password" placeholder="Mật khẩu" name="password" />
+                    <label for="password">Mật khẩu</label>
+                </div>
+                <div class="form-floating mb-3 mt-3">
+                    <button class="btn btn-success">Đăng nhập</button>
+                </div>
+            </form>
+        </section>
 
-    <div th:replace="base :: footer"></div>
-</body>
+        <div th:replace="base :: footer"></div>
+    </body>
 </html>

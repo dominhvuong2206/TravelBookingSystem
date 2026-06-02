@@ -1,0 +1,62 @@
+﻿<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Quản lý dịch vụ</title>
+        <th:block th:replace="base :: css"></th:block>
+    </head>
+    <body>
+        <div th:replace="base :: header"></div>
+
+        <section class="container">
+            <h1 class="text-center text-info">QUẢN LÝ DỊCH VỤ DU LỊCH</h1>
+
+            <form method="post" th:object="${service}" th:action="@{/admin/services}" enctype="multipart/form-data">
+                <div class="mb-3 mt-3">
+                    <label for="name" class="form-label">Tên dịch vụ: </label>
+                    <input type="text" class="form-control" id="name" placeholder="Tên dịch vụ" th:field="*{name}" />
+                </div>
+                <div class="mb-3 mt-3">
+                    <label for="price" class="form-label">Giá dịch vụ: </label>
+                    <input type="number" class="form-control" id="price" placeholder="Giá dịch vụ" th:field="*{price}" />
+                </div>
+                <div class="mb-3 mt-3">
+                    <label for="location" class="form-label">Địa điểm: </label>
+                    <input type="text" class="form-control" id="location" placeholder="Địa điểm" th:field="*{location}" />
+                </div>
+                <div class="mb-3 mt-3">
+                    <label for="departureLocation" class="form-label">Nơi khởi hành: </label>
+                    <input type="text" class="form-control" id="departureLocation" placeholder="Nơi khởi hành" th:field="*{departureLocation}" />
+                </div>
+                <div class="mb-3 mt-3">
+                    <label for="availableSlots" class="form-label">Số chỗ trống: </label>
+                    <input type="number" class="form-control" id="availableSlots" placeholder="Số chỗ trống" th:field="*{availableSlots}" />
+                </div>
+                <div class="mb-3 mt-3">
+                    <label for="cate" class="form-label">Danh mục dịch vụ: </label>
+                    <select class="form-select" th:field="*{categoryId}" id="cate">
+                        <option th:each="c: ${categories}" th:value="${c.id}" th:text="${c.name}"></option>
+                    </select>
+                </div>
+                <div class="mb-3 mt-3">
+                    <label for="file" class="form-label">Ảnh minh họa: </label>
+                    <input type="file" class="form-control" id="file" th:field="*{file}" />
+                </div>
+                <div class="mb-3 mt-3" th:if="${service.image != null}">
+                    <img th:src="${service.image}" width="200" />
+                </div>
+
+                <button th:if="${service.id == null}" class="btn btn-success mb-2">Thêm dịch vụ</button>
+                <button th:unless="${service.id == null}" class="btn btn-success mb-2">Cập nhật dịch vụ</button>
+
+                <input type="hidden" th:field="*{id}" />
+                <input type="hidden" th:field="*{image}" />
+                <input type="hidden" th:field="*{status}" />
+                <input type="hidden" th:field="*{createdDate}" />
+                <input type="hidden" th:field="*{providerId}" />
+            </form>
+        </section>
+
+        <div th:replace="base :: footer"></div>
+    </body>
+</html>

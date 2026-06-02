@@ -1,4 +1,4 @@
-function deleteProduct(url) {
+function deleteTravelService(url) {
     if (confirm("Bạn chắc chắn xóa?") === true) {
         fetch(url, {
             method: "delete"

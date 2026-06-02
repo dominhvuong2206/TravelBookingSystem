@@ -15,7 +15,7 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-CREATE DATABASE IF NOT EXISTS `traveldb` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS `travelbookingdb` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `travelbookingdb`;
 
 --
@@ -79,6 +79,11 @@ CREATE TABLE `service_category` (
 
 LOCK TABLES `service_category` WRITE;
 /*!40000 ALTER TABLE `service_category` DISABLE KEYS */;
+INSERT INTO `service_category` (`id`, `name`, `slug`, `description`, `active`) VALUES
+(1, 'Tour du lịch', 'tour', 'Các tour du lịch trong và ngoài nước', b'1'),
+(2, 'Khách sạn', 'hotel', 'Dịch vụ đặt phòng khách sạn', b'1'),
+(3, 'Vé máy bay', 'flight', 'Dịch vụ vé máy bay', b'1'),
+(4, 'Vé xe khách', 'bus', 'Dịch vụ vé xe khách', b'1');
 /*!40000 ALTER TABLE `service_category` ENABLE KEYS */;
 UNLOCK TABLES;
 

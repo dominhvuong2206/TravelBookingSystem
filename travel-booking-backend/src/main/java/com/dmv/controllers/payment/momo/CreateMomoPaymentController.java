@@ -26,7 +26,7 @@ public class CreateMomoPaymentController extends MomoPaymentControllerSupport {
             String secretKey = property("momo.secret.key");
             String requestId = partnerCode + System.currentTimeMillis();
             String orderId = "TRAVEL-" + bookingId + "-" + System.currentTimeMillis();
-            String orderInfo = "Thanh toán dịch vụ: " + booking.getServiceNameSnapshot();
+            String orderInfo = "Thanh toÃ¡n dá»‹ch vá»¥: " + booking.getServiceNameSnapshot();
             String redirectUrl = frontendUrl() + "/payment-return/momo/" + bookingId;
             String ipnUrl = backendUrl() + "/api/payments/momo/ipn";
             String extraData = "";
@@ -54,7 +54,7 @@ public class CreateMomoPaymentController extends MomoPaymentControllerSupport {
             if (payUrl == null) {
                 failBookingPayment(bookingId, orderId);
                 return ResponseEntity.status(502).body(Map.of(
-                        "error", "MoMo không trả về link thanh toán.",
+                        "error", "MoMo khÃ´ng tráº£ vá» link thanh toÃ¡n.",
                         "detail", res.getBody()
                 ));
             }

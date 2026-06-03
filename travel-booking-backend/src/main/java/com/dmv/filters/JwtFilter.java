@@ -35,7 +35,7 @@ public class JwtFilter implements Filter {
                 System.err.println(e.getMessage());
             }
             if (username == null) {
-                ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token không hợp lệ hoặc hết hạn");
+                ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token khÃ´ng há»£p lá»‡ hoáº·c háº¿t háº¡n");
                 return;
             }
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);

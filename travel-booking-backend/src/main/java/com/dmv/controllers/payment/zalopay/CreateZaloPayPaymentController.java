@@ -83,6 +83,6 @@ public class CreateZaloPayPaymentController extends ZaloPayPaymentControllerSupp
             if (returnMessage != null && !returnMessage.toString().isBlank())
                 return "ZaloPay: " + returnMessage;
         }
-        return "ZaloPay không trả về link thanh toán.";
+        return "ZaloPay khÃ´ng tráº£ vá» link thanh toÃ¡n.";
     }
 }

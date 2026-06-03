@@ -1,22 +1,25 @@
 package com.dmv.repository.impl;
 import com.dmv.pojo.Booking;
+import com.dmv.pojo.PaymentTransaction;
 import com.dmv.pojo.TravelService;
 import com.dmv.repository.TravelServiceRepository;
 import com.dmv.repository.BookingRepository;
 import com.dmv.repository.UserRepository;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Selection;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,17 +32,20 @@ public class BookingRepositoryImpl implements BookingRepository {
     private UserRepository userRepo;
     @Autowired
     private TravelServiceRepository travelServiceRepo;
+
     @Override
     public Booking addBooking(Booking booking) {
         Session session = this.factory.getObject().getCurrentSession();
         session.persist(booking);
         return booking;
     }
+
     @Override
     public Booking getBookingById(int id) {
         Session session = this.factory.getObject().getCurrentSession();
         return session.get(Booking.class, id);
     }
+
     @Override
     public List<Booking> getBookings(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
@@ -58,6 +64,7 @@ public class BookingRepositoryImpl implements BookingRepository {
         }
         return query.getResultList();
     }
+
     @Override
     public Long countBookings(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
@@ -68,182 +75,257 @@ public class BookingRepositoryImpl implements BookingRepository {
         q.where(buildPredicates(b, root, params).toArray(Predicate[]::new));
         return session.createQuery(q).getSingleResult();
     }
+
     @Override
     public Long sumRevenue(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        if (params != null && "PAID".equals(params.get("paymentStatus"))) {
-            StringBuilder sql = new StringBuilder(
-                    "SELECT COALESCE(SUM(p.amount), 0) FROM payment_transaction p " +
-                    "JOIN booking b ON p.booking_id = b.id " +
-                    "WHERE p.status = 'PAID'"
-            );
-            if (params.get("providerId") != null)
-                sql.append(" AND b.service_id IN (SELECT ts.id FROM travel_service ts WHERE ts.provider_id = :providerId)");
-            var query = session.createNativeQuery(sql.toString());
-            if (params.get("providerId") != null)
-                query.setParameter("providerId", Integer.valueOf(params.get("providerId")));
-            Object value = query.getSingleResult();
-            return value == null ? 0L : ((Number) value).longValue();
-        }
         CriteriaBuilder b = session.getCriteriaBuilder();
+
+        if (params != null && "PAID".equals(params.get("paymentStatus"))) {
+     
+            CriteriaQuery<Long> q = b.createQuery(Long.class);
+            Root<PaymentTransaction> ptRoot = q.from(PaymentTransaction.class);
+            Join<PaymentTransaction, Booking> bookingJoin = ptRoot.join("bookingId", JoinType.INNER);
+
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(b.equal(ptRoot.get("status"), "PAID"));
+            if (params.get("providerId") != null)
+                predicates.add(b.equal(
+                        bookingJoin.get("serviceId").get("providerId").get("id"),
+                        Integer.valueOf(params.get("providerId"))
+                ));
+            q.select(b.coalesce(b.sum(ptRoot.get("amount")), 0L));
+            q.where(predicates.toArray(Predicate[]::new));
+            Long result = session.createQuery(q).getSingleResult();
+            return result == null ? 0L : result;
+        }
+
         CriteriaQuery<Long> q = b.createQuery(Long.class);
         Root<Booking> root = q.from(Booking.class);
         q.select(b.coalesce(b.sum(root.get("totalPrice")), 0L));
         q.where(buildPredicates(b, root, params).toArray(Predicate[]::new));
         return session.createQuery(q).getSingleResult();
     }
+
     @Override
     public Map<Integer, Long> revenueByMonth(int year, Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        StringBuilder sql = new StringBuilder(
-                "SELECT MONTH(p.created_date), COALESCE(SUM(p.amount), 0) " +
-                "FROM payment_transaction p " +
-                "JOIN booking b ON p.booking_id = b.id " +
-                "WHERE YEAR(p.created_date) = :year AND p.status = 'PAID'"
-        );
+        CriteriaBuilder b = session.getCriteriaBuilder();
+        CriteriaQuery<Object[]> q = b.createQuery(Object[].class);
+        Root<PaymentTransaction> ptRoot = q.from(PaymentTransaction.class);
+        Join<PaymentTransaction, Booking> bookingJoin = ptRoot.join("bookingId", JoinType.INNER);
+
+        Expression<Integer> monthExpr = b.function("MONTH", Integer.class, ptRoot.get("createdDate"));
+        Expression<Integer> yearExpr  = b.function("YEAR",  Integer.class, ptRoot.get("createdDate"));
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(b.equal(yearExpr, year));
+        predicates.add(b.equal(ptRoot.get("status"), "PAID"));
         if (params != null && params.get("providerId") != null)
-            sql.append(" AND b.service_id IN (SELECT ts.id FROM travel_service ts WHERE ts.provider_id = :providerId)");
-        sql.append(" GROUP BY MONTH(p.created_date)");
-        var query = session.createNativeQuery(sql.toString(), Object[].class);
-        query.setParameter("year", year);
-        if (params != null && params.get("providerId") != null)
-            query.setParameter("providerId", Integer.valueOf(params.get("providerId")));
+            predicates.add(b.equal(
+                    bookingJoin.get("serviceId").get("providerId").get("id"),
+                    Integer.valueOf(params.get("providerId"))
+            ));
+
+        q.multiselect(monthExpr, b.sum(ptRoot.get("amount")));
+        q.where(predicates.toArray(Predicate[]::new));
+        q.groupBy(monthExpr);
+
         Map<Integer, Long> result = new HashMap<>();
-        for (int i = 1; i <= 12; i++)
-            result.put(i, 0L);
-        for (Object[] row : query.getResultList())
+        for (int i = 1; i <= 12; i++) result.put(i, 0L);
+        for (Object[] row : session.createQuery(q).getResultList())
             result.put(((Number) row[0]).intValue(), ((Number) row[1]).longValue());
         return result;
     }
+
     @Override
     public Map<Integer, Long> revenueByQuarter(int year, Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        StringBuilder sql = new StringBuilder(
-                "SELECT QUARTER(p.created_date), COALESCE(SUM(p.amount), 0) " +
-                "FROM payment_transaction p " +
-                "JOIN booking b ON p.booking_id = b.id " +
-                "WHERE YEAR(p.created_date) = :year AND p.status = 'PAID'"
-        );
+        CriteriaBuilder b = session.getCriteriaBuilder();
+        CriteriaQuery<Object[]> q = b.createQuery(Object[].class);
+        Root<PaymentTransaction> ptRoot = q.from(PaymentTransaction.class);
+        Join<PaymentTransaction, Booking> bookingJoin = ptRoot.join("bookingId", JoinType.INNER);
+
+        Expression<Integer> quarterExpr = b.function("QUARTER", Integer.class, ptRoot.get("createdDate"));
+        Expression<Integer> yearExpr    = b.function("YEAR",    Integer.class, ptRoot.get("createdDate"));
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(b.equal(yearExpr, year));
+        predicates.add(b.equal(ptRoot.get("status"), "PAID"));
         if (params != null && params.get("providerId") != null)
-            sql.append(" AND b.service_id IN (SELECT ts.id FROM travel_service ts WHERE ts.provider_id = :providerId)");
-        sql.append(" GROUP BY QUARTER(p.created_date)");
-        var query = session.createNativeQuery(sql.toString(), Object[].class);
-        query.setParameter("year", year);
-        if (params != null && params.get("providerId") != null)
-            query.setParameter("providerId", Integer.valueOf(params.get("providerId")));
+            predicates.add(b.equal(
+                    bookingJoin.get("serviceId").get("providerId").get("id"),
+                    Integer.valueOf(params.get("providerId"))
+            ));
+
+        q.multiselect(quarterExpr, b.sum(ptRoot.get("amount")));
+        q.where(predicates.toArray(Predicate[]::new));
+        q.groupBy(quarterExpr);
+
         Map<Integer, Long> result = new HashMap<>();
-        for (int i = 1; i <= 4; i++)
-            result.put(i, 0L);
-        for (Object[] row : query.getResultList())
+        for (int i = 1; i <= 4; i++) result.put(i, 0L);
+        for (Object[] row : session.createQuery(q).getResultList())
             result.put(((Number) row[0]).intValue(), ((Number) row[1]).longValue());
         return result;
     }
+
     @Override
     public Map<Integer, Long> revenueByYear(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        StringBuilder sql = new StringBuilder(
-                "SELECT YEAR(p.created_date), COALESCE(SUM(p.amount), 0) " +
-                "FROM payment_transaction p " +
-                "JOIN booking b ON p.booking_id = b.id " +
-                "WHERE p.status = 'PAID'"
-        );
+        CriteriaBuilder b = session.getCriteriaBuilder();
+        CriteriaQuery<Object[]> q = b.createQuery(Object[].class);
+        Root<PaymentTransaction> ptRoot = q.from(PaymentTransaction.class);
+        Join<PaymentTransaction, Booking> bookingJoin = ptRoot.join("bookingId", JoinType.INNER);
+
+        Expression<Integer> yearExpr = b.function("YEAR", Integer.class, ptRoot.get("createdDate"));
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(b.equal(ptRoot.get("status"), "PAID"));
         if (params != null && params.get("providerId") != null)
-            sql.append(" AND b.service_id IN (SELECT ts.id FROM travel_service ts WHERE ts.provider_id = :providerId)");
-        sql.append(" GROUP BY YEAR(p.created_date) ORDER BY YEAR(p.created_date) DESC");
-        var query = session.createNativeQuery(sql.toString(), Object[].class);
-        if (params != null && params.get("providerId") != null)
-            query.setParameter("providerId", Integer.valueOf(params.get("providerId")));
+            predicates.add(b.equal(
+                    bookingJoin.get("serviceId").get("providerId").get("id"),
+                    Integer.valueOf(params.get("providerId"))
+            ));
+
+        q.multiselect(yearExpr, b.sum(ptRoot.get("amount")));
+        q.where(predicates.toArray(Predicate[]::new));
+        q.groupBy(yearExpr);
+        q.orderBy(b.desc(yearExpr));
+
         Map<Integer, Long> result = new HashMap<>();
-        for (Object[] row : query.getResultList())
+        for (Object[] row : session.createQuery(q).getResultList())
             result.put(((Number) row[0]).intValue(), ((Number) row[1]).longValue());
         return result;
     }
+
     @Override
     public Map<Integer, Long> bookingFrequencyByMonth(int year, Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        StringBuilder sql = new StringBuilder(
-                "SELECT MONTH(b.created_date), COUNT(b.id) " +
-                "FROM booking b " +
-                "WHERE YEAR(b.created_date) = :year AND b.status <> 'CANCELLED'"
-        );
+        CriteriaBuilder b = session.getCriteriaBuilder();
+        CriteriaQuery<Object[]> q = b.createQuery(Object[].class);
+        Root<Booking> root = q.from(Booking.class);
+
+        Expression<Integer> monthExpr = b.function("MONTH", Integer.class, root.get("createdDate"));
+        Expression<Integer> yearExpr  = b.function("YEAR",  Integer.class, root.get("createdDate"));
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(b.equal(yearExpr, year));
+        predicates.add(b.notEqual(root.get("status"), "CANCELLED"));
         if (params != null && params.get("providerId") != null)
-            sql.append(" AND b.service_id IN (SELECT ts.id FROM travel_service ts WHERE ts.provider_id = :providerId)");
-        sql.append(" GROUP BY MONTH(b.created_date)");
-        var query = session.createNativeQuery(sql.toString(), Object[].class);
-        query.setParameter("year", year);
-        if (params != null && params.get("providerId") != null)
-            query.setParameter("providerId", Integer.valueOf(params.get("providerId")));
+            predicates.add(b.equal(
+                    root.get("serviceId").get("providerId").get("id"),
+                    Integer.valueOf(params.get("providerId"))
+            ));
+
+        q.multiselect(monthExpr, b.count(root));
+        q.where(predicates.toArray(Predicate[]::new));
+        q.groupBy(monthExpr);
+
         Map<Integer, Long> result = new HashMap<>();
-        for (int i = 1; i <= 12; i++)
-            result.put(i, 0L);
-        for (Object[] row : query.getResultList())
+        for (int i = 1; i <= 12; i++) result.put(i, 0L);
+        for (Object[] row : session.createQuery(q).getResultList())
             result.put(((Number) row[0]).intValue(), ((Number) row[1]).longValue());
         return result;
     }
+
     @Override
     public Map<Integer, Long> bookingFrequencyByQuarter(int year, Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        StringBuilder sql = new StringBuilder(
-                "SELECT QUARTER(b.created_date), COUNT(b.id) " +
-                "FROM booking b " +
-                "WHERE YEAR(b.created_date) = :year AND b.status <> 'CANCELLED'"
-        );
+        CriteriaBuilder b = session.getCriteriaBuilder();
+        CriteriaQuery<Object[]> q = b.createQuery(Object[].class);
+        Root<Booking> root = q.from(Booking.class);
+
+        Expression<Integer> quarterExpr = b.function("QUARTER", Integer.class, root.get("createdDate"));
+        Expression<Integer> yearExpr    = b.function("YEAR",    Integer.class, root.get("createdDate"));
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(b.equal(yearExpr, year));
+        predicates.add(b.notEqual(root.get("status"), "CANCELLED"));
         if (params != null && params.get("providerId") != null)
-            sql.append(" AND b.service_id IN (SELECT ts.id FROM travel_service ts WHERE ts.provider_id = :providerId)");
-        sql.append(" GROUP BY QUARTER(b.created_date)");
-        var query = session.createNativeQuery(sql.toString(), Object[].class);
-        query.setParameter("year", year);
-        if (params != null && params.get("providerId") != null)
-            query.setParameter("providerId", Integer.valueOf(params.get("providerId")));
+            predicates.add(b.equal(
+                    root.get("serviceId").get("providerId").get("id"),
+                    Integer.valueOf(params.get("providerId"))
+            ));
+
+        q.multiselect(quarterExpr, b.count(root));
+        q.where(predicates.toArray(Predicate[]::new));
+        q.groupBy(quarterExpr);
+
         Map<Integer, Long> result = new HashMap<>();
-        for (int i = 1; i <= 4; i++)
-            result.put(i, 0L);
-        for (Object[] row : query.getResultList())
+        for (int i = 1; i <= 4; i++) result.put(i, 0L);
+        for (Object[] row : session.createQuery(q).getResultList())
             result.put(((Number) row[0]).intValue(), ((Number) row[1]).longValue());
         return result;
     }
+
     @Override
     public Map<Integer, Long> bookingFrequencyByYear(Map<String, String> params) {
         Session session = this.factory.getObject().getCurrentSession();
-        StringBuilder sql = new StringBuilder(
-                "SELECT YEAR(b.created_date), COUNT(b.id) " +
-                "FROM booking b " +
-                "WHERE b.status <> 'CANCELLED'"
-        );
+        CriteriaBuilder b = session.getCriteriaBuilder();
+        CriteriaQuery<Object[]> q = b.createQuery(Object[].class);
+        Root<Booking> root = q.from(Booking.class);
+
+        Expression<Integer> yearExpr = b.function("YEAR", Integer.class, root.get("createdDate"));
+
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(b.notEqual(root.get("status"), "CANCELLED"));
         if (params != null && params.get("providerId") != null)
-            sql.append(" AND b.service_id IN (SELECT ts.id FROM travel_service ts WHERE ts.provider_id = :providerId)");
-        sql.append(" GROUP BY YEAR(b.created_date) ORDER BY YEAR(b.created_date) DESC");
-        var query = session.createNativeQuery(sql.toString(), Object[].class);
-        if (params != null && params.get("providerId") != null)
-            query.setParameter("providerId", Integer.valueOf(params.get("providerId")));
+            predicates.add(b.equal(
+                    root.get("serviceId").get("providerId").get("id"),
+                    Integer.valueOf(params.get("providerId"))
+            ));
+
+        q.multiselect(yearExpr, b.count(root));
+        q.where(predicates.toArray(Predicate[]::new));
+        q.groupBy(yearExpr);
+        q.orderBy(b.desc(yearExpr));
+
         Map<Integer, Long> result = new HashMap<>();
-        for (Object[] row : query.getResultList())
+        for (Object[] row : session.createQuery(q).getResultList())
             result.put(((Number) row[0]).intValue(), ((Number) row[1]).longValue());
         return result;
     }
+
     @Override
     public List<Map<String, Object>> statsByService(Integer providerId) {
         Session session = this.factory.getObject().getCurrentSession();
-        StringBuilder sql = new StringBuilder("""
-            SELECT b.service_id,
-                   b.service_name_snapshot,
-                   SUM(CASE WHEN b.status <> 'CANCELLED' THEN 1 ELSE 0 END) AS booking_count,
-                   COALESCE(SUM(CASE WHEN p.status = 'PAID' THEN p.amount ELSE 0 END), 0) AS paid_revenue
-            FROM booking b
-            LEFT JOIN payment_transaction p ON p.booking_id = b.id
-            WHERE 1 = 1
-            """);
+        CriteriaBuilder b = session.getCriteriaBuilder();
+        CriteriaQuery<Object[]> q = b.createQuery(Object[].class);
+        Root<Booking> root = q.from(Booking.class);
+        Join<Booking, PaymentTransaction> ptJoin = root.join("paymentTransactionCollection", JoinType.LEFT);
+
+        Expression<Long> bookingCountExpr = b.sum(
+                b.<Long>selectCase()
+                        .when(b.notEqual(root.get("status"), "CANCELLED"), 1L)
+                        .otherwise(0L)
+        );
+
+        Expression<Long> paidRevenueExpr = b.coalesce(
+                b.sum(
+                        b.<Long>selectCase()
+                                .when(b.equal(ptJoin.get("status"), "PAID"), ptJoin.<Long>get("amount"))
+                                .otherwise(0L)
+                ),
+                0L
+        );
+
+        List<Predicate> predicates = new ArrayList<>();
         if (providerId != null)
-            sql.append(" AND b.service_id IN (SELECT ts.id FROM travel_service ts WHERE ts.provider_id = :providerId)");
-        sql.append("""
-            GROUP BY b.service_id, b.service_name_snapshot
-            ORDER BY paid_revenue DESC
-            """);
+            predicates.add(b.equal(root.get("serviceId").get("providerId").get("id"), providerId));
+
+        q.multiselect(
+                root.get("serviceId").get("id"),
+                root.get("serviceNameSnapshot"),
+                bookingCountExpr,
+                paidRevenueExpr
+        );
+        if (!predicates.isEmpty())
+            q.where(predicates.toArray(Predicate[]::new));
+        q.groupBy(root.get("serviceId").get("id"), root.get("serviceNameSnapshot"));
+        q.orderBy(b.desc(paidRevenueExpr));
+
         List<Map<String, Object>> result = new ArrayList<>();
-        var query = session.createNativeQuery(sql.toString(), Object[].class);
-        if (providerId != null)
-            query.setParameter("providerId", providerId);
-        for (Object[] row : query.getResultList()) {
+        for (Object[] row : session.createQuery(q).getResultList()) {
             Map<String, Object> item = new HashMap<>();
             item.put("serviceId", row[0]);
             item.put("serviceName", row[1]);
@@ -253,11 +335,13 @@ public class BookingRepositoryImpl implements BookingRepository {
         }
         return result;
     }
+
     @Override
     public Booking updateBooking(Booking booking) {
         Session session = this.factory.getObject().getCurrentSession();
         return session.merge(booking);
     }
+
     private List<Predicate> buildPredicates(CriteriaBuilder b, Root<Booking> root, Map<String, String> params) {
         List<Predicate> predicates = new ArrayList<>();
         if (params == null)

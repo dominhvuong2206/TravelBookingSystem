@@ -2,6 +2,7 @@ package com.dmv.service;
 import com.dmv.pojo.ServiceCategory;
 import java.util.List;
 import java.util.Map;
+
 public interface ServiceCategoryService {
     List<ServiceCategory> getCategories();
     List<ServiceCategory> getCategories(Map<String, String> params);

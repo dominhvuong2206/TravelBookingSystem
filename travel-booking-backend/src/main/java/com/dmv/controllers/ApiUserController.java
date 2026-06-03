@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
 @RestController
 @RequestMapping("/api")
 @CrossOrigin
@@ -39,10 +40,10 @@ public class ApiUserController {
                 String token = JwtUtils.generateToken(u.getUsername());
                 return ResponseEntity.ok().body(Collections.singletonMap("token", token));
             } catch (Exception e) {
-                return ResponseEntity.status(500).body("Lỗi khi tạo JWT");
+                return ResponseEntity.status(500).body("Lá»—i khi táº¡o JWT");
             }
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sai thông tin đăng nhập");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sai thÃ´ng tin Ä‘Äƒng nháº­p");
     }
     @GetMapping("/secure/profile")
     public ResponseEntity<User> getProfile(Principal principal) {

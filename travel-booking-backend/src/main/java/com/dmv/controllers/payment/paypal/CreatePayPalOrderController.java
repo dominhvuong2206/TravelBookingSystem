@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+
 @RestController
 @RequestMapping("/api/secure/payments/paypal/create")
 public class CreatePayPalOrderController extends PayPalPaymentControllerSupport {
@@ -70,7 +71,7 @@ public class CreatePayPalOrderController extends PayPalPaymentControllerSupport 
                     .orElse(null);
             if (payUrl == null) {
                 failBookingPayment(bookingId, null);
-                return ResponseEntity.status(502).body(Map.of("error", "PayPal không trả về link thanh toán."));
+                return ResponseEntity.status(502).body(Map.of("error", "PayPal khÃ´ng tráº£ vá» link thanh toÃ¡n."));
             }
             return ResponseEntity.ok(Map.of("payUrl", payUrl, "orderId", orderRes.getBody().get("id")));
         } catch (Exception e) {

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 @Service
 public class PaymentTransactionServiceImpl implements PaymentTransactionService {
     @Autowired
@@ -108,7 +109,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
     }
     private PaymentTransaction markPaid(PaymentTransaction transaction) {
         if ("CANCELLED".equals(transaction.getBookingId().getStatus()))
-            throw new IllegalStateException("Không thể xác nhận thanh toán cho booking đã hủy.");
+            throw new IllegalStateException("KhÃ´ng thá»ƒ xÃ¡c nháº­n thanh toÃ¡n cho booking Ä‘Ã£ há»§y.");
         transaction.setStatus("PAID");
         transaction.getBookingId().setPaymentStatus("PAID");
         this.bookingRepo.updateBooking(transaction.getBookingId());

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+
 @RestController
 @RequestMapping("/api/secure/payments/zalopay/create")
 public class CreateZaloPayPaymentController extends ZaloPayPaymentControllerSupport {
@@ -82,6 +83,6 @@ public class CreateZaloPayPaymentController extends ZaloPayPaymentControllerSupp
             if (returnMessage != null && !returnMessage.toString().isBlank())
                 return "ZaloPay: " + returnMessage;
         }
-        return "ZaloPay không trả về link thanh toán.";
+        return "ZaloPay khÃ´ng tráº£ vá» link thanh toÃ¡n.";
     }
 }

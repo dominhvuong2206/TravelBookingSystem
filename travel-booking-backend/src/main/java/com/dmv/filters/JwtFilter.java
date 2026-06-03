@@ -12,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+
 public class JwtFilter implements Filter {
     private final UserDetailsService userDetailsService;
     public JwtFilter(UserDetailsService userDetailsService) {
@@ -34,7 +35,7 @@ public class JwtFilter implements Filter {
                 System.err.println(e.getMessage());
             }
             if (username == null) {
-                ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token không hợp lệ hoặc hết hạn");
+                ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token khÃ´ng há»£p lá»‡ hoáº·c háº¿t háº¡n");
                 return;
             }
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);

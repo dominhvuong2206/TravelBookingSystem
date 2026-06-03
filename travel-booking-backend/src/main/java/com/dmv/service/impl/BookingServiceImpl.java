@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 @Service
 public class BookingServiceImpl implements BookingService {
     @Autowired
@@ -35,11 +36,11 @@ public class BookingServiceImpl implements BookingService {
         TravelService service = this.travelServiceRepo.getTravelServiceById(Integer.parseInt(params.get("serviceId")));
         int quantity = Integer.parseInt(params.getOrDefault("quantity", "1"));
         if (service == null)
-            throw new IllegalArgumentException("Dịch vụ không tồn tại.");
+            throw new IllegalArgumentException("Dá»‹ch vá»¥ khÃ´ng tá»“n táº¡i.");
         if (quantity <= 0)
-            throw new IllegalArgumentException("Số lượng không hợp lệ.");
+            throw new IllegalArgumentException("Sá»‘ lÆ°á»£ng khÃ´ng há»£p lá»‡.");
         if (service.getAvailableSlots() != null && service.getAvailableSlots() < quantity)
-            throw new IllegalArgumentException("Không đủ chỗ trống.");
+            throw new IllegalArgumentException("KhÃ´ng Ä‘á»§ chá»— trá»‘ng.");
         Booking booking = new Booking();
         booking.setServiceNameSnapshot(service.getName());
         booking.setUnitPrice(service.getPrice());
@@ -89,9 +90,9 @@ public class BookingServiceImpl implements BookingService {
         if (booking == null)
             return null;
         if (!"PENDING".equals(booking.getStatus()))
-            throw new IllegalArgumentException("Chỉ có thể hủy booking đang chờ xác nhận.");
+            throw new IllegalArgumentException("Chá»‰ cÃ³ thá»ƒ há»§y booking Ä‘ang chá» xÃ¡c nháº­n.");
         if ("PAID".equals(booking.getPaymentStatus()))
-            throw new IllegalArgumentException("Không thể hủy booking đã thanh toán.");
+            throw new IllegalArgumentException("KhÃ´ng thá»ƒ há»§y booking Ä‘Ã£ thanh toÃ¡n.");
         booking.setStatus("CANCELLED");
         cancelPendingTransaction(booking);
         restoreSlots(booking);
@@ -114,7 +115,7 @@ public class BookingServiceImpl implements BookingService {
         if (booking == null)
             return null;
         if (!"PENDING".equals(booking.getStatus()))
-            throw new IllegalArgumentException("Chỉ có thể xác nhận booking đang chờ.");
+            throw new IllegalArgumentException("Chá»‰ cÃ³ thá»ƒ xÃ¡c nháº­n booking Ä‘ang chá».");
         booking.setStatus("CONFIRMED");
         return this.bookingRepo.updateBooking(booking);
     }
@@ -126,7 +127,7 @@ public class BookingServiceImpl implements BookingService {
         if ("CANCELLED".equals(booking.getStatus()))
             return booking;
         if ("PAID".equals(booking.getPaymentStatus()))
-            throw new IllegalArgumentException("Không thể hủy booking đã thanh toán.");
+            throw new IllegalArgumentException("KhÃ´ng thá»ƒ há»§y booking Ä‘Ã£ thanh toÃ¡n.");
         if ("PENDING".equals(booking.getStatus()))
             restoreSlots(booking);
         booking.setStatus("CANCELLED");
@@ -139,7 +140,7 @@ public class BookingServiceImpl implements BookingService {
         if (booking == null)
             return null;
         if ("CANCELLED".equals(booking.getStatus()))
-            throw new IllegalArgumentException("Không thể xác nhận thanh toán cho booking đã hủy.");
+            throw new IllegalArgumentException("KhÃ´ng thá»ƒ xÃ¡c nháº­n thanh toÃ¡n cho booking Ä‘Ã£ há»§y.");
         booking.setPaymentStatus("PAID");
         Booking updatedBooking = this.bookingRepo.updateBooking(booking);
         PaymentTransaction transaction = this.paymentTransactionRepo.getTransactionByBookingId(bookingId);

@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
 @RestController
 @RequestMapping("/api/secure/provider")
 @CrossOrigin
@@ -36,7 +37,7 @@ public class ApiProviderServiceController {
     public ResponseEntity<?> getProviderServices(@RequestParam Map<String, String> params, Principal principal) {
         User provider = getApprovedProvider(principal);
         if (provider == null)
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Tài khoản nhà cung cấp chưa được duyệt.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("TÃ i khoáº£n nhÃ  cung cáº¥p chÆ°a Ä‘Æ°á»£c duyá»‡t.");
         Map<String, String> filters = buildProviderFilters(params, provider);
         List<TravelService> services = this.travelServiceService.getTravelServices(filters);
         return ResponseEntity.ok(services);
@@ -45,7 +46,7 @@ public class ApiProviderServiceController {
     public ResponseEntity<?> countProviderServices(@RequestParam Map<String, String> params, Principal principal) {
         User provider = getApprovedProvider(principal);
         if (provider == null)
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Tài khoản nhà cung cấp chưa được duyệt.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("TÃ i khoáº£n nhÃ  cung cáº¥p chÆ°a Ä‘Æ°á»£c duyá»‡t.");
         Map<String, String> filters = buildProviderFilters(params, provider);
         return ResponseEntity.ok(this.travelServiceService.countTravelServices(filters));
     }
@@ -56,7 +57,7 @@ public class ApiProviderServiceController {
             Principal principal) {
         User provider = getApprovedProvider(principal);
         if (provider == null)
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Tài khoản nhà cung cấp chưa được duyệt.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("TÃ i khoáº£n nhÃ  cung cáº¥p chÆ°a Ä‘Æ°á»£c duyá»‡t.");
         TravelService service = buildService(params, new TravelService());
         service.setProviderId(provider);
         service.setCreatedDate(new Date());
@@ -72,7 +73,7 @@ public class ApiProviderServiceController {
             Principal principal) {
         User provider = getApprovedProvider(principal);
         if (provider == null)
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Tài khoản nhà cung cấp chưa được duyệt.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("TÃ i khoáº£n nhÃ  cung cáº¥p chÆ°a Ä‘Æ°á»£c duyá»‡t.");
         TravelService service = getOwnedService(id, provider);
         if (service == null)
             return ResponseEntity.notFound().build();
@@ -85,7 +86,7 @@ public class ApiProviderServiceController {
     public ResponseEntity<?> toggleProviderServiceStatus(@PathVariable(value = "id") int id, Principal principal) {
         User provider = getApprovedProvider(principal);
         if (provider == null)
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Tài khoản nhà cung cấp chưa được duyệt.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("TÃ i khoáº£n nhÃ  cung cáº¥p chÆ°a Ä‘Æ°á»£c duyá»‡t.");
         TravelService service = getOwnedService(id, provider);
         if (service == null)
             return ResponseEntity.notFound().build();
@@ -97,7 +98,7 @@ public class ApiProviderServiceController {
     public ResponseEntity<?> deleteProviderService(@PathVariable(value = "id") int id, Principal principal) {
         User provider = getApprovedProvider(principal);
         if (provider == null)
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Tài khoản nhà cung cấp chưa được duyệt.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("TÃ i khoáº£n nhÃ  cung cáº¥p chÆ°a Ä‘Æ°á»£c duyá»‡t.");
         TravelService service = getOwnedService(id, provider);
         if (service == null)
             return ResponseEntity.notFound().build();
@@ -142,7 +143,7 @@ public class ApiProviderServiceController {
             try {
                 service.setDepartureDate(new SimpleDateFormat("yyyy-MM-dd").parse(departureDate));
             } catch (Exception ex) {
-                throw new IllegalArgumentException("Ngày khởi hành không hợp lệ.");
+                throw new IllegalArgumentException("NgÃ y khá»Ÿi hÃ nh khÃ´ng há»£p lá»‡.");
             }
         }
         return service;

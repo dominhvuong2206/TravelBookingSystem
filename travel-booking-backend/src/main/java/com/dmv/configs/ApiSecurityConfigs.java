@@ -37,13 +37,12 @@ public class ApiSecurityConfigs {
                     .requestMatchers("/api/secure/pay").hasRole("CUSTOMER")
                     .requestMatchers("/api/secure/payments/**").hasRole("CUSTOMER")
                     .requestMatchers("/api/secure/bookings/**").hasRole("CUSTOMER")
-                    .requestMatchers(
-                            "/api/payments/stripe/create",
+                    .requestMatchers( "/api/payments/stripe/create",
                             "/api/payments/stripe/confirm",
                             "/api/payments/paypal/create",
                             "/api/payments/paypal/capture",
                             "/api/payments/momo/create",
-                            "/api/payments/zalopay/create"
+                            "/api/payments/zalopay/create"                
                     ).hasRole("CUSTOMER")
                     .requestMatchers("/api/secure/**").authenticated()
                     .anyRequest().permitAll()

@@ -53,9 +53,8 @@ public class CreateMomoPaymentController extends MomoPaymentControllerSupport {
             Object payUrl = res.getBody() != null ? res.getBody().get("payUrl") : null;
             if (payUrl == null) {
                 failBookingPayment(bookingId, orderId);
-                return ResponseEntity.status(502).body(Map.of(
-                        "error", "MoMo không trả về link thanh toán.",
-                        "detail", res.getBody()
+                return ResponseEntity.status(502).body(Map.of( "error", "MoMo không trả về link thanh toán.",
+                        "detail", res.getBody()            
                 ));
             }
             return ResponseEntity.ok(Map.of("payUrl", payUrl.toString(), "orderId", orderId));

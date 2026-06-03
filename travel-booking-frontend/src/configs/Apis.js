@@ -1,6 +1,8 @@
 import axios from "axios";
 import cookies from 'react-cookies'
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080/TravelBookingSystem/api/";
+
 export const endpoints = {
     'categories': '/categories',
     'products': '/services',
@@ -73,7 +75,7 @@ export const authApis = (accessToken = null) => {
     const token = accessToken || cookies.load('token') || localStorage.getItem("token");
 
     return axios.create({
-        baseURL: "http://localhost:8080/TravelBookingSystem/api/",
+        baseURL: API_BASE_URL,
         headers: {
             'Authorization': `Bearer ${token}`
         }
@@ -81,5 +83,5 @@ export const authApis = (accessToken = null) => {
 }
 
 export default axios.create({
-    baseURL: "http://localhost:8080/TravelBookingSystem/api/"
+    baseURL: API_BASE_URL
 })

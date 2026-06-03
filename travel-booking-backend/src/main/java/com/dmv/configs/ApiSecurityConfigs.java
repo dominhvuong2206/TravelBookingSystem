@@ -6,9 +6,12 @@ package com.dmv.configs;
 
 import com.dmv.filters.JwtFilter;
 import java.util.List;
+import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -25,9 +28,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
  */
 @Configuration
 @Order(1)
+@PropertySource("classpath:configs.properties")
 public class ApiSecurityConfigs {
     @Autowired
     private UserDetailsService userDetailsService;
+    @Autowired
+    private Environment env;
 
     @Bean
     public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
@@ -61,7 +67,7 @@ public class ApiSecurityConfigs {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(List.of("http://localhost:3000")); 
+        config.setAllowedOrigins(corsOrigins()); 
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         config.setExposedHeaders(List.of("Authorization"));
@@ -71,5 +77,25 @@ public class ApiSecurityConfigs {
         source.registerCorsConfiguration("/**", config);
 
         return source;
+    }
+
+    private List<String> corsOrigins() {
+        String origins = config("cors.allowed.origins");
+        if (origins == null || origins.isBlank())
+            origins = config("frontend.url");
+        if (origins == null || origins.isBlank())
+            origins = "http://localhost:3000";
+
+        return Stream.of(origins.split(","))
+                .map(String::trim)
+                .filter(origin -> !origin.isBlank())
+                .toList();
+    }
+
+    private String config(String name) {
+        String value = System.getenv(name.toUpperCase().replace('.', '_'));
+        if (value == null || value.isBlank())
+            value = env.getProperty(name);
+        return value;
     }
 }

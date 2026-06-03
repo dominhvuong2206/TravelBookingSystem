@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -26,6 +28,7 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 @Configuration
 @EnableWebSecurity
 @EnableTransactionManagement
+@PropertySource("classpath:configs.properties")
 @ComponentScan(
         basePackages = {
             "com.dmv.controllers",
@@ -38,6 +41,8 @@ public class SpringSecurityConfigs {
 
     @Autowired
     private UserDetailsService userDetailsService;
+    @Autowired
+    private Environment env;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -78,11 +83,18 @@ public class SpringSecurityConfigs {
     public Cloudinary cloudinary() {
         Cloudinary cloudinary
                 = new Cloudinary(ObjectUtils.asMap(
-                        "cloud_name", "dlvmrl6g4",
-                        "api_key", "382554788796221",
-                        "api_secret", "cH2oJwMLa7EvbMytwEamYqexYNE",
+                        "cloud_name", config("cloudinary.cloud_name"),
+                        "api_key", config("cloudinary.api_key"),
+                        "api_secret", config("cloudinary.api_secret"),
                         "secure", true));
         return cloudinary;
+    }
+
+    private String config(String name) {
+        String value = System.getenv(name.toUpperCase().replace('.', '_'));
+        if (value == null || value.isBlank())
+            value = env.getProperty(name);
+        return value == null ? "" : value;
     }
     
 //    @Bean

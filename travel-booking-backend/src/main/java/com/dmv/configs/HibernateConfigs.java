@@ -40,18 +40,61 @@ public class HibernateConfigs {
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName(env.getProperty("hibernate.connection.driverClass"));
-        dataSource.setUrl(env.getProperty("hibernate.connection.url"));
-        dataSource.setUsername(env.getProperty("hibernate.connection.username"));
-        dataSource.setPassword(env.getProperty("hibernate.connection.password"));
+        dataSource.setDriverClassName(config("hibernate.connection.driverClass"));
+        dataSource.setUrl(databaseUrl());
+        dataSource.setUsername(databaseUsername());
+        dataSource.setPassword(databasePassword());
         return dataSource;
     }
 
     private Properties hibernateProperties() {
         Properties props = new Properties();
-        props.put(DIALECT, env.getProperty("hibernate.dialect"));
-        props.put(SHOW_SQL, env.getProperty("hibernate.showSql"));
+        props.put(DIALECT, config("hibernate.dialect"));
+        props.put(SHOW_SQL, config("hibernate.showSql"));
         return props;
+    }
+
+    private String databaseUrl() {
+        String url = config("hibernate.connection.url");
+        if (url != null && !url.isBlank() && !url.contains("localhost"))
+            return url;
+
+        String host = env("MYSQLHOST");
+        String port = env("MYSQLPORT");
+        String database = env("MYSQLDATABASE");
+        if (host != null && !host.isBlank() && database != null && !database.isBlank()) {
+            if (port == null || port.isBlank())
+                port = "3306";
+            return String.format("jdbc:mysql://%s:%s/%s?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC",
+                    host, port, database);
+        }
+
+        return url;
+    }
+
+    private String databaseUsername() {
+        String username = env("MYSQLUSER");
+        if (username == null || username.isBlank())
+            username = config("hibernate.connection.username");
+        return username;
+    }
+
+    private String databasePassword() {
+        String password = env("MYSQLPASSWORD");
+        if (password == null)
+            password = config("hibernate.connection.password");
+        return password;
+    }
+
+    private String config(String name) {
+        String value = env(name.toUpperCase().replace('.', '_'));
+        if (value == null || value.isBlank())
+            value = env.getProperty(name);
+        return value;
+    }
+
+    private String env(String name) {
+        return System.getenv(name);
     }
 
     @Bean

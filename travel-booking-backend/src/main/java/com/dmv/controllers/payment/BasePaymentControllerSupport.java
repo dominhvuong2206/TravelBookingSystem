@@ -30,9 +30,9 @@ public abstract class BasePaymentControllerSupport {
     }
 
     protected String property(String name, String defaultValue) {
-        String value = this.env.getProperty(name);
+        String value = System.getenv(name.toUpperCase().replace('.', '_'));
         if (value == null || value.isBlank())
-            value = System.getenv(name.toUpperCase().replace('.', '_'));
+            value = this.env.getProperty(name);
         if ((value == null || value.isBlank()) && defaultValue != null)
             return defaultValue;
         if (value == null || value.isBlank())

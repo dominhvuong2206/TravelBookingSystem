@@ -51,6 +51,9 @@ public class HibernateConfigs {
         Properties props = new Properties();
         props.put(DIALECT, config("hibernate.dialect"));
         props.put(SHOW_SQL, config("hibernate.showSql"));
+        props.put("hibernate.connection.charSet", "UTF-8");
+        props.put("hibernate.connection.characterEncoding", "UTF-8");
+        props.put("hibernate.connection.useUnicode", "true");
         return props;
     }
 
@@ -65,7 +68,7 @@ public class HibernateConfigs {
         if (host != null && !host.isBlank() && database != null && !database.isBlank()) {
             if (port == null || port.isBlank())
                 port = "3306";
-            return String.format("jdbc:mysql://%s:%s/%s?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC",
+            return String.format("jdbc:mysql://%s:%s/%s?useUnicode=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC",
                     host, port, database);
         }
 

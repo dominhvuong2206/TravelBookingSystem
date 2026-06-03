@@ -4,8 +4,10 @@
  */
 package com.dmv.configs;
 
+import jakarta.servlet.Filter;
 import jakarta.servlet.MultipartConfigElement;
 import jakarta.servlet.ServletRegistration;
+import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 /**
@@ -46,8 +48,11 @@ public class DispatcherServletInit extends AbstractAnnotationConfigDispatcherSer
         registration.setMultipartConfig(new MultipartConfigElement(location, maxFileSize, maxRequestSize, fileSizeThreshold));
     }
     
-//    @Override
-//    protected Filter[] getServletFilters() {
-//        return new Filter[] { new JwtFilter() }; // Filter sẽ áp dụng cho mọi request
-//    }
+    @Override
+    protected Filter[] getServletFilters() {
+        CharacterEncodingFilter encodingFilter = new CharacterEncodingFilter();
+        encodingFilter.setEncoding("UTF-8");
+        encodingFilter.setForceEncoding(true);
+        return new Filter[] { encodingFilter };
+    }
 }

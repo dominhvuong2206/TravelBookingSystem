@@ -73,7 +73,7 @@ const Home = () => {
 
     useEffect(() => {
         loadProducts();
-    }, [q, page]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [q, page]); 
 
     useEffect(() => {
         setFilters(initialFilters(q));
@@ -239,7 +239,7 @@ const Home = () => {
                                 </Card.Text>
                                 <div style={styles.cardActions}>
                                     <Button variant="primary" size="sm" onClick={() => nav(`/services/${p.id}/book`)}>Đặt dịch vụ</Button>
-                                    <Button variant="outline-primary" size="sm" onClick={() => nav(`/products/${p.id}`)}>Chi tiết</Button>
+                                    <Button variant="outline-primary" size="sm" onClick={() => nav(`/services/${p.id}`)}>Chi tiết</Button>
                                     <Button variant="outline-primary" size="sm" onClick={() => openChat(p)}>
                                         <FontAwesomeIcon icon="fa-solid fa-comment-dots" className="me-1" />
                                         Liên hệ
@@ -285,3 +285,4 @@ const Home = () => {
 };
 
 export default Home;
+

@@ -1,4 +1,4 @@
-const productDetailsStyles = {
+const serviceDetailsStyles = {
     page: {
         padding: "24px 0 40px",
     },
@@ -167,7 +167,7 @@ const productDetailsStyles = {
     },
 };
 
-export const productDetailsResponsive = `
+export const serviceDetailsResponsive = `
 @media (max-width: 992px) {
   .service-detail-responsive-hero { grid-template-columns: 1fr !important; }
 }
@@ -176,4 +176,4 @@ export const productDetailsResponsive = `
 }
 `;
 
-export default productDetailsStyles;
+export default serviceDetailsStyles;

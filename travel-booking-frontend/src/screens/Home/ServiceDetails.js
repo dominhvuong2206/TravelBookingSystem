@@ -7,7 +7,7 @@ import "moment/locale/vi";
 import Apis, { authApis, endpoints } from "../../configs/Apis";
 import { CompareContext, MyUserContext } from "../../configs/Contexts";
 import { formatDate } from "../../utils/dateUtils";
-import styles, { productDetailsResponsive } from "./ProductDetailsStyle";
+import styles, { serviceDetailsResponsive } from "./ServiceDetailsStyle";
 
 moment.locale("vi");
 
@@ -37,8 +37,8 @@ const InfoBox = ({ icon, label, value }) => (
     </div>
 );
 
-const ProductDetails = () => {
-    const { productId } = useParams();
+const ServiceDetails = () => {
+    const { serviceId } = useParams();
     const [product, setProduct] = useState(null);
     const [ratingSummary, setRatingSummary] = useState({ averageRating: 0, totalReviews: 0 });
     const [comments, setComments] = useState([]);
@@ -59,8 +59,8 @@ const ProductDetails = () => {
 
     const loadProduct = async () => {
         const [serviceRes, ratingRes] = await Promise.all([
-            Apis.get(endpoints["product-details"](productId)),
-            Apis.get(endpoints["rating-summary"](productId)),
+            Apis.get(endpoints["product-details"](serviceId)),
+            Apis.get(endpoints["rating-summary"](serviceId)),
         ]);
         setProduct(serviceRes.data);
         setRatingSummary(ratingRes.data);
@@ -75,7 +75,7 @@ const ProductDetails = () => {
 
         try {
             const res = await Apis.get(
-                `${endpoints["comments"](productId)}?page=${pageToLoad}&pageSize=${PAGE_SIZE}`
+                `${endpoints["comments"](serviceId)}?page=${pageToLoad}&pageSize=${PAGE_SIZE}`
             );
             const newComments = res.data;
             setComments(current => replace ? newComments : [...current, ...newComments]);
@@ -87,14 +87,14 @@ const ProductDetails = () => {
             loadingRef.current = false;
             setLoadingComments(false);
         }
-    }, [productId]);
+    }, [serviceId]);
 
     const loadTotalComments = useCallback(async () => {
         try {
-            const res = await Apis.get(endpoints["comments-count"](productId));
+            const res = await Apis.get(endpoints["comments-count"](serviceId));
             setTotalComments(Number(res.data));
         } catch (_) {}
-    }, [productId]);
+    }, [serviceId]);
 
     const addComment = async () => {
         if (!comment.trim()) {
@@ -103,7 +103,7 @@ const ProductDetails = () => {
         }
         try {
             setErr("");
-            await authApis().post(endpoints["addComment"](productId), {
+            await authApis().post(endpoints["addComment"](serviceId), {
                 rating: String(rating),
                 comment,
             });
@@ -112,7 +112,7 @@ const ProductDetails = () => {
             hasMoreRef.current = true;
             commentPageRef.current = 1;
             await loadComments(1, true);
-            const ratingRes = await Apis.get(endpoints["rating-summary"](productId));
+            const ratingRes = await Apis.get(endpoints["rating-summary"](serviceId));
             setRatingSummary(ratingRes.data);
             loadTotalComments();
         } catch (ex) {
@@ -129,7 +129,7 @@ const ProductDetails = () => {
         loadProduct();
         loadComments(1, true);
         loadTotalComments();
-    }, [productId]); 
+    }, [serviceId]); 
 
     useEffect(() => {
         const sentinel = sentinelRef.current;
@@ -157,7 +157,7 @@ const ProductDetails = () => {
 
     return (
         <div style={styles.page}>
-            <style>{productDetailsResponsive}</style>
+            <style>{serviceDetailsResponsive}</style>
 
             <div style={styles.breadcrumb}>Trang chủ / {product.categoryId?.name || "Dịch vụ"} / {product.name}</div>
 
@@ -226,7 +226,7 @@ const ProductDetails = () => {
 
                 {user === null ? (
                     <Alert variant="info">
-                        Vui lòng <Button size="sm" variant="warning" onClick={() => nav(`/login?next=/products/${productId}`)}>đăng nhập</Button> để đánh giá dịch vụ.
+                        Vui lòng <Button size="sm" variant="warning" onClick={() => nav(`/login?next=/products/${serviceId}`)}>đăng nhập</Button> để đánh giá dịch vụ.
                     </Alert>
                 ) : (
                     <div style={styles.reviewForm}>
@@ -296,4 +296,5 @@ const ProductDetails = () => {
     );
 };
 
-export default ProductDetails;
+export default ServiceDetails;
+

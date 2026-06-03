@@ -4,12 +4,7 @@ import moment from "moment";
 import "moment/locale/vi";
 import { MyUserContext } from "../../configs/Contexts";
 import { normalizeRole } from "../../utils/authUtils";
-import {
-    ensureChatRoom,
-    listenChatMessages,
-    listenChatRooms,
-    sendChatMessage,
-} from "../../services/firebaseChatService";
+import { ensureChatRoom,listenChatMessages,listenChatRooms, sendChatMessage,} from "../../services/firebaseChatService";
 import styles from "./TravelChatStyle";
 
 moment.locale("vi");

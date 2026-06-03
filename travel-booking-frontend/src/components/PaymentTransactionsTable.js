@@ -71,7 +71,7 @@ const PaymentTransactionsTable = ({
 
     useEffect(() => {
         loadPayments();
-    }, [page, status, paymentMethod]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [page, status, paymentMethod]);
 
     const markPaid = async (transactionId) => {
         if (!markPaidEndpoint)

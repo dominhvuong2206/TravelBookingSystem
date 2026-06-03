@@ -8,7 +8,7 @@ import CompareBar from "./components/CompareBar";
 import Home from "./screens/Home/Home";
 import Register from "./screens/User/Register";
 import Login from "./screens/User/Login";
-import ProductDetails from "./screens/Home/ProductDetails";
+import ServiceDetails from "./screens/Home/ServiceDetails";
 import ProtectedRoute from "./components/routing/ProtectedRoute";
 import AdminRoute from "./components/routing/AdminRoute";
 import ProviderRoute from "./components/routing/ProviderRoute";
@@ -48,7 +48,7 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/products/:productId" element={<ProductDetails />} />
+          <Route path="/services/:serviceId" element={<ServiceDetails />} />
           <Route path="/services/:serviceId/book" element={
             <CustomerRoute>
               <Booking />
@@ -157,3 +157,5 @@ const App = () => {
 };
 
 export default App;
+
+

@@ -102,7 +102,7 @@ const PaymentReturn = () => {
                     const resultCode = searchParams.get("resultCode");
                     setStatus(resultCode === "0" ? "success" : "pending");
                     setMessage(resultCode === "0"
-                        ? "MoMo đã ghi nhận thanh toán. Hệ thống sẽ cập nhật sau khi nhận IPN."
+                        ? "MoMo đã ghi nhận thanh toán. Hệ thống sẽ cập nhật sau khi nhận ."
                         : "MoMo chưa hoàn tất thanh toán.");
                 } else if (method === "zalopay") {
                     setStatus("pending");
@@ -170,7 +170,7 @@ const PaymentReturn = () => {
                     <div style={styles.actions}>
                         <Button as={Link} to="/my-payments" variant="primary">Xem giao dịch</Button>
                         <Button as={Link} to="/my-bookings" variant="outline-secondary">Xem booking</Button>
-                        {serviceId && <Button as={Link} to={`/products/${serviceId}`} variant="outline-secondary">Chi tiết dịch vụ</Button>}
+                        {serviceId && <Button as={Link} to={`/services/${serviceId}`} variant="outline-secondary">Chi tiết dịch vụ</Button>}
                         <Button as={Link} to="/" variant="outline-dark">Về trang chủ</Button>
                     </div>
                 </>}
@@ -180,3 +180,4 @@ const PaymentReturn = () => {
 };
 
 export default PaymentReturn;
+

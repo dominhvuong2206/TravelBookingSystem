@@ -72,7 +72,7 @@ const MyServices = () => {
     useEffect(() => {
         if (page === 1)
             loadServices();
-    }, [filters]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [filters]); 
 
     const deleteService = async (service) => {
         if (!window.confirm(`Xóa vĩnh viễn dịch vụ "${service.name}"?`))

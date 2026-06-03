@@ -43,7 +43,7 @@ const MyBookings = () => {
 
     useEffect(() => {
         loadBookings();
-    }, [page]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [page]);
 
     const cancelBooking = async (booking) => {
         if (!window.confirm(`Hủy booking #${booking.id}?`))
@@ -82,7 +82,7 @@ const MyBookings = () => {
                     return <tr key={booking.id}>
                         <td>{booking.id}</td>
                         <td>
-                            {serviceId ? <Link to={`/products/${serviceId}`} className="fw-semibold text-decoration-none">
+                            {serviceId ? <Link to={`/services/${serviceId}`} className="fw-semibold text-decoration-none">
                                 {booking.serviceNameSnapshot}
                             </Link> : booking.serviceNameSnapshot}
                         </td>
@@ -119,3 +119,4 @@ const MyBookings = () => {
 };
 
 export default MyBookings;
+

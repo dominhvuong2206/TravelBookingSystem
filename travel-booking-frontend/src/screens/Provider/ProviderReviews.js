@@ -66,7 +66,7 @@ const ProviderReviews = () => {
             <tbody>
                 {reviews.map(review => <tr key={review.id}>
                     <td>
-                        {review.serviceId?.id ? <Link to={`/products/${review.serviceId.id}`} className="fw-semibold text-decoration-none">
+                        {review.serviceId?.id ? <Link to={`/services/${review.serviceId.id}`} className="fw-semibold text-decoration-none">
                             {review.serviceId?.name}
                         </Link> : review.serviceId?.name}
                     </td>
@@ -100,3 +100,4 @@ const ProviderReviews = () => {
 };
 
 export default ProviderReviews;
+

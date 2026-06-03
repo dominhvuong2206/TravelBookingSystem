@@ -4,6 +4,7 @@ import com.dmv.pojo.PaymentTransaction;
 import com.dmv.pojo.TravelService;
 import com.dmv.pojo.User;
 import com.dmv.repository.BookingRepository;
+import com.dmv.repository.StatsRepository;
 import com.dmv.repository.PaymentTransactionRepository;
 import com.dmv.repository.TravelServiceRepository;
 import com.dmv.repository.UserRepository;
@@ -19,6 +20,8 @@ import org.springframework.stereotype.Service;
 public class BookingServiceImpl implements BookingService {
     @Autowired
     private BookingRepository bookingRepo;
+    @Autowired
+    private StatsRepository statsRepo;
     @Autowired
     private TravelServiceRepository travelServiceRepo;
     @Autowired
@@ -162,7 +165,7 @@ public class BookingServiceImpl implements BookingService {
         result.put("totalServices", this.travelServiceRepo.countTravelServices(serviceFilter));
         result.put("totalBookings", this.bookingRepo.countBookings(bookingFilter));
         result.put("pendingBookings", this.bookingRepo.countBookings(pendingFilter));
-        result.put("paidRevenue", this.bookingRepo.sumRevenue(paidFilter));
+        result.put("paidRevenue", this.statsRepo.sumRevenue(paidFilter));
         return result;
     }
     @Override
@@ -170,7 +173,7 @@ public class BookingServiceImpl implements BookingService {
         User provider = this.userRepo.getUserByUsername(username);
         Map<String, String> filter = new HashMap<>();
         filter.put("providerId", String.valueOf(provider.getId()));
-        Map<Integer, Long> byMonth = this.bookingRepo.revenueByMonth(year, filter);
+        Map<Integer, Long> byMonth = this.statsRepo.revenueByMonth(year, filter);
         return buildRevenueResult(year, byMonth);
     }
     @Override
@@ -178,7 +181,7 @@ public class BookingServiceImpl implements BookingService {
         User provider = this.userRepo.getUserByUsername(username);
         Map<String, String> filter = new HashMap<>();
         filter.put("providerId", String.valueOf(provider.getId()));
-        Map<Integer, Long> byQuarter = this.bookingRepo.revenueByQuarter(year, filter);
+        Map<Integer, Long> byQuarter = this.statsRepo.revenueByQuarter(year, filter);
         return buildRevenueResult(year, byQuarter);
     }
     @Override
@@ -186,13 +189,13 @@ public class BookingServiceImpl implements BookingService {
         User provider = this.userRepo.getUserByUsername(username);
         Map<String, String> filter = new HashMap<>();
         filter.put("providerId", String.valueOf(provider.getId()));
-        Map<Integer, Long> byYear = this.bookingRepo.revenueByYear(filter);
+        Map<Integer, Long> byYear = this.statsRepo.revenueByYear(filter);
         return buildRevenueResult(null, byYear);
     }
     @Override
     public List<Map<String, Object>> getProviderStatsByService(String username) {
         User provider = this.userRepo.getUserByUsername(username);
-        return this.bookingRepo.statsByService(provider.getId());
+        return this.statsRepo.statsByService(provider.getId());
     }
     @Override
     public Long countAllBookings() {
@@ -200,35 +203,35 @@ public class BookingServiceImpl implements BookingService {
     }
     @Override
     public Long sumAllRevenue(Map<String, String> params) {
-        return this.bookingRepo.sumRevenue(params);
+        return this.statsRepo.sumRevenue(params);
     }
     @Override
     public Map<String, Object> getAdminRevenueByMonth(int year) {
-        return buildRevenueResult(year, this.bookingRepo.revenueByMonth(year, null));
+        return buildRevenueResult(year, this.statsRepo.revenueByMonth(year, null));
     }
     @Override
     public Map<String, Object> getAdminRevenueByQuarter(int year) {
-        return buildRevenueResult(year, this.bookingRepo.revenueByQuarter(year, null));
+        return buildRevenueResult(year, this.statsRepo.revenueByQuarter(year, null));
     }
     @Override
     public Map<String, Object> getAdminRevenueByYear() {
-        return buildRevenueResult(null, this.bookingRepo.revenueByYear(null));
+        return buildRevenueResult(null, this.statsRepo.revenueByYear(null));
     }
     @Override
     public Map<String, Object> getAdminBookingFrequencyByMonth(int year) {
-        return buildRevenueResult(year, this.bookingRepo.bookingFrequencyByMonth(year, null));
+        return buildRevenueResult(year, this.statsRepo.bookingFrequencyByMonth(year, null));
     }
     @Override
     public Map<String, Object> getAdminBookingFrequencyByQuarter(int year) {
-        return buildRevenueResult(year, this.bookingRepo.bookingFrequencyByQuarter(year, null));
+        return buildRevenueResult(year, this.statsRepo.bookingFrequencyByQuarter(year, null));
     }
     @Override
     public Map<String, Object> getAdminBookingFrequencyByYear() {
-        return buildRevenueResult(null, this.bookingRepo.bookingFrequencyByYear(null));
+        return buildRevenueResult(null, this.statsRepo.bookingFrequencyByYear(null));
     }
     @Override
     public List<Map<String, Object>> getAdminStatsByService() {
-        return this.bookingRepo.statsByService(null);
+        return this.statsRepo.statsByService(null);
     }
     private Map<String, Object> buildRevenueResult(Integer year, Map<Integer, Long> values) {
         long total = values.values().stream().mapToLong(Long::longValue).sum();

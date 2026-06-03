@@ -16,6 +16,7 @@ import jakarta.persistence.TemporalType;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
+
 @Entity
 @Table(name = "booking")
 public class Booking implements Serializable {

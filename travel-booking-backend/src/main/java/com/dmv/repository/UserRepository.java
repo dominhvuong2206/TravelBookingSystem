@@ -2,6 +2,7 @@ package com.dmv.repository;
 import com.dmv.pojo.User;
 import java.util.List;
 import java.util.Map;
+
 public interface UserRepository {
     User getUserByUsername(String username);
     User getUserById(int id);

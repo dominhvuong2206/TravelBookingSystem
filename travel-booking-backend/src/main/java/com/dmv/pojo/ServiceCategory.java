@@ -12,6 +12,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.util.Collection;
+
 @Entity
 @Table(name = "service_category")
 @NamedQueries({

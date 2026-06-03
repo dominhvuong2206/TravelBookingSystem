@@ -8,6 +8,7 @@ import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import java.util.Date;
+
 public class JwtUtils {
     private static final String SECRET = "12345678901234567890123456789012"; 
     private static final long EXPIRATION_MS = 86400000; 

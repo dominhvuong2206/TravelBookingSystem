@@ -23,6 +23,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
 @Repository
 @PropertySource("classpath:configs.properties")
 @Transactional

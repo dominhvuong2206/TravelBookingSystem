@@ -3,6 +3,7 @@ import com.dmv.pojo.ServiceCategory;
 import java.text.ParseException;
 import java.util.Locale;
 import org.springframework.format.Formatter;
+
 public class CategoryFormatter implements Formatter<ServiceCategory> {
     @Override
     public String print(ServiceCategory cate, Locale locale) {

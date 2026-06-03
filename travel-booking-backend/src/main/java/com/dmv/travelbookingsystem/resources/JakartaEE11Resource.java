@@ -2,6 +2,7 @@ package com.dmv.travelbookingsystem.resources;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.Response;
+
 @Path("jakartaee11")
 public class JakartaEE11Resource {
     @GET

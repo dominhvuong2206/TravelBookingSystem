@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+
 public abstract class PayPalPaymentControllerSupport extends BasePaymentControllerSupport {
     protected String paypalApiBase() {
         return property("paypal.api.base", "https://api-m.sandbox.paypal.com");

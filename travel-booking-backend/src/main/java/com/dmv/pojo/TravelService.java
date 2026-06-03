@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import org.springframework.web.multipart.MultipartFile;
+
 @Entity
 @Table(name = "travel_service")
 @NamedQueries({

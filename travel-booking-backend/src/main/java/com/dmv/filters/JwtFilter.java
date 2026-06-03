@@ -12,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+
 public class JwtFilter implements Filter {
     private final UserDetailsService userDetailsService;
     public JwtFilter(UserDetailsService userDetailsService) {

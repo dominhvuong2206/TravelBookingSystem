@@ -9,15 +9,52 @@ Hệ thống đặt vé du lịch trực tuyến — project môn học.
 | **Frontend (AWS S3)** | http://travel-booking-dmv.s3-website-ap-southeast-1.amazonaws.com/ |
 | **Backend API (Railway)** | https://travelbookingsystem-production-e035.up.railway.app/TravelBookingSystem/api/ |
 
-## Kiến trúc
+## Kiến trúc Hệ thống (System Architecture)
 
+Dự án được xây dựng theo mô hình **Client-Server** với Frontend và Backend tách biệt hoàn toàn (Decoupled Architecture), giao tiếp qua **RESTful API**.
+
+### 1. Backend Architecture (Spring MVC)
+Backend áp dụng kiến trúc **N-Tier (Layered Architecture)** truyền thống của Spring, chia làm các tầng rõ rệt để đảm bảo Separation of Concerns (SoC).
+
+```text
+travel-booking-backend/src/main/java/com/dmv/
+├── configs/       # Cấu hình hệ thống (Spring, Hibernate, Security, JWT, Cloudinary)
+├── controllers/   # Tầng Controller: Tiếp nhận HTTP Request, xử lý Routing & gọi Service
+│   ├── admin/     # API dành riêng cho Admin
+│   ├── provider/  # API dành riêng cho Provider 
+│   ├── payment/   # Tích hợp cổng thanh toán (Stripe, PayPal, ZaloPay, MoMo)
+│   └── ...        # Các API chung (Public, Auth)
+├── service/       # Tầng Business Logic: Xử lý nghiệp vụ lõi của ứng dụng
+├── repository/    # Tầng Data Access (DAO): Tương tác trực tiếp với Database qua Hibernate
+├── pojo/          # Tầng Domain/Entity: Các lớp Java ánh xạ 1-1 với bảng trong cơ sở dữ liệu (ORM)
+├── filters/       # Tầng Security Filter: Chặn request, kiểm tra và xác thực JWT token
+└── utils/         # Các hàm tiện ích (Utils), constants dùng chung
 ```
-TravelBookingSystem/
-├── travel-booking-backend/   # Spring MVC + Hibernate + Tomcat (deploy Railway)
-├── travel-booking-frontend/  # React (deploy AWS S3)
-├── travelbookingdb.sql        # Schema database (utf8mb4)
-└── seed-travel-sample-data.sql # Dữ liệu mẫu 100 dịch vụ
+
+**Luồng xử lý (Data Flow):**
+`Client Request` ➡️ `JWT Filter` (Xác thực) ➡️ `Controller` ➡️ `Service` (Logic) ➡️ `Repository` (DB query) ➡️ `MySQL`
+
+### 2. Frontend Architecture (React)
+Frontend được cấu trúc theo Component-Based Architecture, quản lý trạng thái (State) tập trung và phân định rõ UI Component với Logic.
+
+```text
+travel-booking-frontend/src/
+├── components/    # Dumb/Shared Components: Các UI components dùng chung (Navbar, Footer, Button...)
+├── screens/       # Smart Components (Pages/Views): Các trang chính đại diện cho các Route
+│   ├── Admin/     # Giao diện Dashboard quản lý cho Admin
+│   ├── Provider/  # Giao diện quản lý dịch vụ/booking cho Provider
+│   ├── Customer/  # Giao diện người dùng cuối (Home, Booking, Payment...)
+│   └── Auth/      # Giao diện Đăng nhập / Đăng ký
+├── services/      # API Services: Các module đóng gói Axios để gọi API (Auth API, Booking API...)
+├── reducers/      # State Management: Chứa các reducers (useReducer/Context API) quản lý global state
+├── configs/       # Cấu hình App, cấu hình Axios instance, interceptors, constants
+└── utils/         # Các helper functions (Format tiền tệ, xử lý ngày tháng...)
 ```
+
+**Quản lý State & Route:**
+- Sử dụng `React Router` để điều hướng trang (SPA - Single Page Application).
+- Quản lý Global State (như thông tin User đang đăng nhập) thông qua `Context API` kết hợp `useReducer`.
+- Gọi API độc lập thông qua `Axios` được thiết lập interceptors để tự động đính kèm JWT token vào header.
 
 ## Tech Stack
 

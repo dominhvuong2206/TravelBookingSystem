@@ -76,7 +76,7 @@ public class CreatePayPalOrderController extends PayPalPaymentControllerSupport 
 
             if (payUrl == null) {
                 failBookingPayment(bookingId, null);
-                return ResponseEntity.status(502).body(Map.of("error", "PayPal khong tra ve link thanh toan."));
+                return ResponseEntity.status(502).body(Map.of("error", "PayPal không trả về link thanh toán."));
             }
 
             return ResponseEntity.ok(Map.of("payUrl", payUrl, "orderId", orderRes.getBody().get("id")));

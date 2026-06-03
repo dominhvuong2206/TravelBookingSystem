@@ -133,7 +133,7 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
 
     private PaymentTransaction markPaid(PaymentTransaction transaction) {
         if ("CANCELLED".equals(transaction.getBookingId().getStatus()))
-            throw new IllegalStateException("Khong the xac nhan thanh toan cho booking da huy.");
+            throw new IllegalStateException("Không thể xác nhận thanh toán cho booking đã hủy.");
 
         transaction.setStatus("PAID");
         transaction.getBookingId().setPaymentStatus("PAID");

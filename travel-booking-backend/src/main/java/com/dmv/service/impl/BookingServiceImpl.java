@@ -40,11 +40,11 @@ public class BookingServiceImpl implements BookingService {
         int quantity = Integer.parseInt(params.getOrDefault("quantity", "1"));
 
         if (service == null)
-            throw new IllegalArgumentException("Dich vu khong ton tai.");
+            throw new IllegalArgumentException("Dịch vụ không tồn tại.");
         if (quantity <= 0)
-            throw new IllegalArgumentException("So luong khong hop le.");
+            throw new IllegalArgumentException("Số lượng không hợp lệ.");
         if (service.getAvailableSlots() != null && service.getAvailableSlots() < quantity)
-            throw new IllegalArgumentException("Khong du cho trong.");
+            throw new IllegalArgumentException("Không đủ chỗ trống.");
 
         Booking booking = new Booking();
         booking.setServiceNameSnapshot(service.getName());
@@ -102,9 +102,9 @@ public class BookingServiceImpl implements BookingService {
         if (booking == null)
             return null;
         if (!"PENDING".equals(booking.getStatus()))
-            throw new IllegalArgumentException("Chi co the huy booking dang cho xac nhan.");
+            throw new IllegalArgumentException("Chỉ có thể hủy booking đang chờ xác nhận.");
         if ("PAID".equals(booking.getPaymentStatus()))
-            throw new IllegalArgumentException("Khong the huy booking da thanh toan.");
+            throw new IllegalArgumentException("Không thể hủy booking đã thanh toán.");
 
         booking.setStatus("CANCELLED");
         cancelPendingTransaction(booking);
@@ -131,7 +131,7 @@ public class BookingServiceImpl implements BookingService {
         if (booking == null)
             return null;
         if (!"PENDING".equals(booking.getStatus()))
-            throw new IllegalArgumentException("Chi co the xac nhan booking dang cho.");
+            throw new IllegalArgumentException("Chỉ có thể xác nhận booking đang chờ.");
 
         booking.setStatus("CONFIRMED");
         return this.bookingRepo.updateBooking(booking);
@@ -145,7 +145,7 @@ public class BookingServiceImpl implements BookingService {
         if ("CANCELLED".equals(booking.getStatus()))
             return booking;
         if ("PAID".equals(booking.getPaymentStatus()))
-            throw new IllegalArgumentException("Khong the huy booking da thanh toan.");
+            throw new IllegalArgumentException("Không thể hủy booking đã thanh toán.");
 
         if ("PENDING".equals(booking.getStatus()))
             restoreSlots(booking);
@@ -161,7 +161,7 @@ public class BookingServiceImpl implements BookingService {
         if (booking == null)
             return null;
         if ("CANCELLED".equals(booking.getStatus()))
-            throw new IllegalArgumentException("Khong the xac nhan thanh toan cho booking da huy.");
+            throw new IllegalArgumentException("Không thể xác nhận thanh toán cho booking đã hủy.");
 
         booking.setPaymentStatus("PAID");
         Booking updatedBooking = this.bookingRepo.updateBooking(booking);

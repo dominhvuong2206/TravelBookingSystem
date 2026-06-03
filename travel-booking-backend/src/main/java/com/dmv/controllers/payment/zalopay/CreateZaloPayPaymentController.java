@@ -91,6 +91,6 @@ public class CreateZaloPayPaymentController extends ZaloPayPaymentControllerSupp
                 return "ZaloPay: " + returnMessage;
         }
 
-        return "ZaloPay khong tra ve link thanh toan.";
+        return "ZaloPay không trả về link thanh toán.";
     }
 }

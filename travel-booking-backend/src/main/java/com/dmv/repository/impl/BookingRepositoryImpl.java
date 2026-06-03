@@ -1,6 +1,5 @@
 package com.dmv.repository.impl;
 import com.dmv.pojo.Booking;
-import com.dmv.pojo.CartItem;
 import com.dmv.pojo.TravelService;
 import com.dmv.repository.TravelServiceRepository;
 import com.dmv.repository.BookingRepository;
@@ -30,31 +29,6 @@ public class BookingRepositoryImpl implements BookingRepository {
     private UserRepository userRepo;
     @Autowired
     private TravelServiceRepository travelServiceRepo;
-    @Override
-    public void addBooking(List<CartItem> carts) {
-        Session session = this.factory.getObject().getCurrentSession();
-        var customer = this.userRepo.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
-        for (var c : carts) {
-            TravelService service = this.travelServiceRepo.getTravelServiceById(c.getId());
-            Booking booking = new Booking();
-            booking.setServiceNameSnapshot(service.getName());
-            booking.setUnitPrice(service.getPrice());
-            booking.setQuantity(c.getQuantity());
-            booking.setTotalPrice(service.getPrice() * c.getQuantity());
-            booking.setStatus("PENDING");
-            booking.setPaymentMethod("CASH");
-            booking.setPaymentStatus("UNPAID");
-            booking.setCreatedDate(new Date());
-            booking.setServiceId(service);
-            booking.setCustomerId(customer);
-            Integer availableSlots = service.getAvailableSlots();
-            if (availableSlots != null) {
-                service.setAvailableSlots(Math.max(availableSlots - c.getQuantity(), 0));
-                session.merge(service);
-            }
-            session.persist(booking);
-        }
-    }
     @Override
     public Booking addBooking(Booking booking) {
         Session session = this.factory.getObject().getCurrentSession();

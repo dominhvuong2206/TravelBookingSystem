@@ -1,11 +1,9 @@
 package com.dmv.service;
-import com.dmv.pojo.CartItem;
 import com.dmv.pojo.Booking;
 import java.util.List;
 import java.util.Map;
 
 public interface BookingService {
-    void addBooking(List<CartItem> carts);
     Booking createBooking(Map<String, String> params, String username);
     List<Booking> getMyBookings(String username, Map<String, String> params);
     Long countMyBookings(String username);

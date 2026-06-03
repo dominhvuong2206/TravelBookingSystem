@@ -41,16 +41,16 @@ public class ReviewServiceImpl implements ReviewService {
         User customer = this.userRepo.getUserByUsername(username);
         TravelService service = this.travelServiceRepo.getTravelServiceById(serviceId);
         if (service == null)
-            throw new IllegalArgumentException("Dá»‹ch vá»¥ khÃ´ng tá»“n táº¡i.");
+            throw new IllegalArgumentException("Dịch vụ không tồn tại.");
         Map<String, String> bookingFilter = new HashMap<>();
         bookingFilter.put("customerId", String.valueOf(customer.getId()));
         bookingFilter.put("serviceId", String.valueOf(serviceId));
         Long bookings = this.bookingRepo.countBookings(bookingFilter);
         if (bookings == 0)
-            throw new IllegalArgumentException("Báº¡n cáº§n Ä‘áº·t dá»‹ch vá»¥ trÆ°á»›c khi Ä‘Ã¡nh giÃ¡.");
+            throw new IllegalArgumentException("Bạn cần đặt dịch vụ trước khi đánh giá.");
         int rating = Integer.parseInt(params.getOrDefault("rating", "5"));
         if (rating < 1 || rating > 5)
-            throw new IllegalArgumentException("Sá»‘ sao Ä‘Ã¡nh giÃ¡ pháº£i tá»« 1 Ä‘áº¿n 5.");
+            throw new IllegalArgumentException("Số sao đánh giá phải từ 1 đến 5.");
         Review review = new Review();
         review.setRating(rating);
         review.setComment(params.get("comment"));
@@ -73,7 +73,7 @@ public class ReviewServiceImpl implements ReviewService {
         if (review == null)
             return null;
         if (!review.getServiceId().getProviderId().getId().equals(provider.getId()))
-            throw new IllegalArgumentException("Báº¡n khÃ´ng cÃ³ quyá»n pháº£n há»“i Ä‘Ã¡nh giÃ¡ nÃ y.");
+            throw new IllegalArgumentException("Bạn không có quyền phản hồi đánh giá này.");
         review.setReplyText(replyText);
         review.setReplyDate(new Date());
         return this.reviewRepo.updateReview(review);

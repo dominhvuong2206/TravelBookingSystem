@@ -1,11 +1,9 @@
 package com.dmv.repository;
-import com.dmv.pojo.CartItem;
 import com.dmv.pojo.Booking;
 import java.util.List;
 import java.util.Map;
 
 public interface BookingRepository {
-    void addBooking(List<CartItem> carts);
     Booking addBooking(Booking booking);
     Booking getBookingById(int id);
     List<Booking> getBookings(Map<String, String> params);

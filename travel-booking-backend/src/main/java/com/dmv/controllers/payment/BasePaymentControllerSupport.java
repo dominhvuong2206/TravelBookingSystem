@@ -31,24 +31,24 @@ public abstract class BasePaymentControllerSupport {
         if ((value == null || value.isBlank()) && defaultValue != null)
             return defaultValue;
         if (value == null || value.isBlank())
-            throw new IllegalStateException("ChÆ°a cáº¥u hÃ¬nh " + name + ".");
+            throw new IllegalStateException("Chưa cấu hình " + name + ".");
         return value;
     }
     protected Booking requirePayableBooking(int bookingId, String paymentMethod) {
         Booking booking = this.bookingRepo.getBookingById(bookingId);
         if (booking == null)
-            throw new IllegalArgumentException("Booking khÃ´ng tá»“n táº¡i.");
+            throw new IllegalArgumentException("Booking không tồn tại.");
         if ("CANCELLED".equalsIgnoreCase(booking.getStatus()))
-            throw new IllegalStateException("Booking Ä‘Ã£ bá»‹ há»§y.");
+            throw new IllegalStateException("Booking đã bị hủy.");
         if (booking.getPaymentMethod() == null || !paymentMethod.equalsIgnoreCase(booking.getPaymentMethod()))
-            throw new IllegalStateException("PhÆ°Æ¡ng thá»©c thanh toÃ¡n cá»§a booking khÃ´ng khá»›p.");
+            throw new IllegalStateException("Phương thức thanh toán của booking không khớp.");
         if ("PAID".equalsIgnoreCase(booking.getPaymentStatus()))
-            throw new IllegalStateException("Booking Ä‘Ã£ thanh toÃ¡n.");
+            throw new IllegalStateException("Booking đã thanh toán.");
         return booking;
     }
     protected long amountOf(Booking booking) {
         if (booking.getTotalPrice() == null || booking.getTotalPrice() <= 0)
-            throw new IllegalStateException("Booking chÆ°a cÃ³ tá»•ng tiá»n há»£p lá»‡.");
+            throw new IllegalStateException("Booking chưa có tổng tiền hợp lệ.");
         return booking.getTotalPrice();
     }
     protected void completePaidBooking(int bookingId, String gatewayTransactionId) {

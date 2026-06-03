@@ -40,10 +40,10 @@ public class ApiUserController {
                 String token = JwtUtils.generateToken(u.getUsername());
                 return ResponseEntity.ok().body(Collections.singletonMap("token", token));
             } catch (Exception e) {
-                return ResponseEntity.status(500).body("Lá»—i khi táº¡o JWT");
+                return ResponseEntity.status(500).body("Lỗi khi tạo JWT");
             }
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sai thÃ´ng tin Ä‘Äƒng nháº­p");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sai thông tin đăng nhập");
     }
     @GetMapping("/secure/profile")
     public ResponseEntity<User> getProfile(Principal principal) {

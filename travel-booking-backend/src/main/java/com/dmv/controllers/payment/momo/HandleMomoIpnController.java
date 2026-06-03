@@ -1,12 +1,10 @@
 package com.dmv.controllers.payment.momo;
-
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 @RestController
 @RequestMapping("/api/payments/momo/ipn")
 public class HandleMomoIpnController extends MomoPaymentControllerSupport {
@@ -25,16 +23,13 @@ public class HandleMomoIpnController extends MomoPaymentControllerSupport {
             String expected = hmacSHA256(secretKey, raw);
             if (!expected.equals(body.get("signature")))
                 return ResponseEntity.ok(Map.of("status", "INVALID_SIGNATURE"));
-
             String orderId = body.get("orderId").toString();
             int bookingId = Integer.parseInt(orderId.split("-")[1]);
             String transId = body.get("transId") != null ? body.get("transId").toString() : orderId;
-
             if ("0".equals(body.get("resultCode").toString()))
                 completePaidBooking(bookingId, transId);
             else
                 failBookingPayment(bookingId, transId);
-
             return ResponseEntity.ok(Map.of("status", "OK"));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));

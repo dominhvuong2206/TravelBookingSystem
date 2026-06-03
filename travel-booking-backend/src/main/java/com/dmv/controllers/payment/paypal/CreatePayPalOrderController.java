@@ -1,5 +1,4 @@
 package com.dmv.controllers.payment.paypal;
-
 import com.dmv.pojo.Booking;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-
 @RestController
 @RequestMapping("/api/secure/payments/paypal/create")
 public class CreatePayPalOrderController extends PayPalPaymentControllerSupport {
@@ -31,7 +29,6 @@ public class CreatePayPalOrderController extends PayPalPaymentControllerSupport 
             String clientId = property("paypal.client.id");
             String clientSecret = property("paypal.client.secret");
             RestTemplate rest = new RestTemplate();
-
             HttpHeaders tokenHeaders = new HttpHeaders();
             tokenHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
             tokenHeaders.set("Authorization", "Basic " + basicAuth(clientId, clientSecret));
@@ -43,7 +40,6 @@ public class CreatePayPalOrderController extends PayPalPaymentControllerSupport 
                     new HttpEntity<>(tokenBody, tokenHeaders),
                     new ParameterizedTypeReference<Map<String, Object>>() {});
             String accessToken = (String) tokenRes.getBody().get("access_token");
-
             HttpHeaders orderHeaders = new HttpHeaders();
             orderHeaders.setContentType(MediaType.APPLICATION_JSON);
             orderHeaders.set("Authorization", "Bearer " + accessToken);
@@ -61,7 +57,6 @@ public class CreatePayPalOrderController extends PayPalPaymentControllerSupport 
                             "user_action", "PAY_NOW"
                     )
             );
-
             ResponseEntity<Map<String, Object>> orderRes = rest.exchange(
                     paypalApiBase() + "/v2/checkout/orders",
                     HttpMethod.POST,
@@ -73,12 +68,10 @@ public class CreatePayPalOrderController extends PayPalPaymentControllerSupport 
                     .findFirst()
                     .map(link -> link.get("href"))
                     .orElse(null);
-
             if (payUrl == null) {
                 failBookingPayment(bookingId, null);
                 return ResponseEntity.status(502).body(Map.of("error", "PayPal không trả về link thanh toán."));
             }
-
             return ResponseEntity.ok(Map.of("payUrl", payUrl, "orderId", orderRes.getBody().get("id")));
         } catch (Exception e) {
             if (payableBooking)

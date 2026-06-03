@@ -1,5 +1,4 @@
 package com.dmv.pojo;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Basic;
@@ -22,11 +21,6 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import org.springframework.web.multipart.MultipartFile;
-
-/**
- *
- * @author Do Minh Vuong
- */
 @Entity
 @Table(name = "travel_service")
 @NamedQueries({
@@ -36,72 +30,53 @@ import org.springframework.web.multipart.MultipartFile;
 @JsonIgnoreProperties(value = {"bookingCollection", "reviewCollection"})
 public class TravelService implements Serializable {
     private static final long serialVersionUID = 1L;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-
     @Basic(optional = false)
     @Column(name = "name")
     private String name;
-
     @Column(name = "description")
     private String description;
-
     @Column(name = "price")
     private Long price;
-
     @Column(name = "image")
     private String image;
-
     @Column(name = "location")
     private String location;
-
     @Column(name = "departure_location")
     private String departureLocation;
-
     @Column(name = "departure_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date departureDate;
-
     @Column(name = "available_slots")
     private Integer availableSlots;
-
     @Column(name = "status")
     private String status;
-
     @Column(name = "created_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
-
     @JoinColumn(name = "category_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private ServiceCategory categoryId;
-
     @JoinColumn(name = "provider_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private User providerId;
-
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "serviceId")
     @JsonIgnore
     private Collection<Booking> bookingCollection;
-
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "serviceId")
     @JsonIgnore
     private Collection<Review> reviewCollection;
-
     @Transient
     private MultipartFile file;
-
     public TravelService() {
     }
-
     public TravelService(Integer id) {
         this.id = id;
     }
-
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
     public String getName() { return name; }

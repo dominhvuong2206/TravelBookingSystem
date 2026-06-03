@@ -1,9 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.dmv.configs;
-
 import com.dmv.filters.JwtFilter;
 import java.util.List;
 import java.util.stream.Stream;
@@ -21,11 +16,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-/**
- *
- * @author Do Minh Vuong
- */
 @Configuration
 @Order(1)
 @PropertySource("classpath:configs.properties")
@@ -34,10 +24,8 @@ public class ApiSecurityConfigs {
     private UserDetailsService userDetailsService;
     @Autowired
     private Environment env;
-
     @Bean
     public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
-
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .securityMatcher("/api/**")
             .csrf(csrf -> csrf.disable())
@@ -59,39 +47,31 @@ public class ApiSecurityConfigs {
                     .requestMatchers("/api/secure/**").authenticated()
                     .anyRequest().permitAll()
             ).addFilterBefore(new JwtFilter(this.userDetailsService), UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
-    
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-
         config.setAllowedOrigins(corsOrigins()); 
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         config.setExposedHeaders(List.of("Authorization"));
         config.setAllowCredentials(true); 
-
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
-
         return source;
     }
-
     private List<String> corsOrigins() {
         String origins = config("cors.allowed.origins");
         if (origins == null || origins.isBlank())
             origins = config("frontend.url");
         if (origins == null || origins.isBlank())
             origins = "http://localhost:3000";
-
         return Stream.of(origins.split(","))
                 .map(String::trim)
                 .filter(origin -> !origin.isBlank())
                 .toList();
     }
-
     private String config(String name) {
         String value = System.getenv(name.toUpperCase().replace('.', '_'));
         if (value == null || value.isBlank())

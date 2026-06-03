@@ -1,5 +1,4 @@
 package com.dmv.controllers;
-
 import com.dmv.pojo.ServiceCategory;
 import com.dmv.service.ServiceCategoryService;
 import java.util.List;
@@ -16,24 +15,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 @RestController
 @RequestMapping("/api/secure/admin/categories")
 @CrossOrigin
 public class ApiAdminCategoryController {
     @Autowired
     private ServiceCategoryService serviceCategoryService;
-
     @GetMapping
     public ResponseEntity<List<ServiceCategory>> list(@RequestParam Map<String, String> params) {
         return ResponseEntity.ok(this.serviceCategoryService.getCategories(params));
     }
-
     @GetMapping("/count")
     public ResponseEntity<Long> count(@RequestParam Map<String, String> params) {
         return ResponseEntity.ok(this.serviceCategoryService.countCategories(params));
     }
-
     @PostMapping
     public ResponseEntity<?> create(@RequestBody Map<String, String> params) {
         try {
@@ -43,7 +38,6 @@ public class ApiAdminCategoryController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
-
     @PutMapping("/{categoryId}")
     public ResponseEntity<?> update(@PathVariable(value = "categoryId") int categoryId, @RequestBody Map<String, String> params) {
         try {
@@ -56,7 +50,6 @@ public class ApiAdminCategoryController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
-
     @PutMapping("/{categoryId}/toggle-active")
     public ResponseEntity<?> toggleActive(@PathVariable(value = "categoryId") int categoryId) {
         ServiceCategory category = this.serviceCategoryService.toggleActive(categoryId);

@@ -1,5 +1,4 @@
 package com.dmv.controllers.payment.stripe;
-
 import com.dmv.pojo.Booking;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
@@ -10,7 +9,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 @RestController
 @RequestMapping("/api/secure/payments/stripe/create")
 public class CreateStripeCheckoutController extends StripePaymentControllerSupport {
@@ -23,7 +21,6 @@ public class CreateStripeCheckoutController extends StripePaymentControllerSuppo
             bookingId = Integer.parseInt(body.get("bookingId").toString());
             Booking booking = requirePayableBooking(bookingId, "STRIPE");
             payableBooking = true;
-
             SessionCreateParams params = SessionCreateParams.builder()
                     .setMode(SessionCreateParams.Mode.PAYMENT)
                     .setSuccessUrl(frontendUrl() + "/payment-return/stripe/" + bookingId + "?session_id={CHECKOUT_SESSION_ID}")
@@ -41,7 +38,6 @@ public class CreateStripeCheckoutController extends StripePaymentControllerSuppo
                                     .build())
                             .build())
                     .build();
-
             Session session = Session.create(params);
             return ResponseEntity.ok(Map.of("payUrl", session.getUrl(), "sessionId", session.getId()));
         } catch (StripeException e) {

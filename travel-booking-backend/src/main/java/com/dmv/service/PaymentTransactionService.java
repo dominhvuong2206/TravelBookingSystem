@@ -1,9 +1,7 @@
 package com.dmv.service;
-
 import com.dmv.pojo.PaymentTransaction;
 import java.util.List;
 import java.util.Map;
-
 public interface PaymentTransactionService {
     List<PaymentTransaction> getMyTransactions(String username, Map<String, String> params);
     Long countMyTransactions(String username);

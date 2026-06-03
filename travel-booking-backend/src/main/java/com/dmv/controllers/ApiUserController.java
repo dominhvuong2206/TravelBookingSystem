@@ -1,9 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.dmv.controllers;
-
 import com.dmv.pojo.User;
 import com.dmv.service.UserService;
 import com.dmv.utils.JwtUtils;
@@ -23,31 +18,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-/**
- *
- * @author Do Minh Vuong
- */
 @RestController
 @RequestMapping("/api")
 @CrossOrigin
 public class ApiUserController {
     @Autowired
     private UserService userService;
-    
     @PostMapping(path = "/users", 
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE, 
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> create(@RequestParam Map<String, String> params, 
             @RequestParam(value = "avatar") MultipartFile avatar) {
         User u = this.userService.addUser(params, avatar);
-        
         return new ResponseEntity<>(u, HttpStatus.CREATED);
     }
-    
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User u) {
-
         if (this.userService.authenticate(u.getUsername(), u.getPassword())) {
             try {
                 String token = JwtUtils.generateToken(u.getUsername());
@@ -58,12 +44,10 @@ public class ApiUserController {
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Sai thông tin đăng nhập");
     }
-
     @GetMapping("/secure/profile")
     public ResponseEntity<User> getProfile(Principal principal) {
         return new ResponseEntity<>(this.userService.getUserByUsername(principal.getName()), HttpStatus.OK);
     }
-
     @PutMapping(path = "/secure/profile",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)

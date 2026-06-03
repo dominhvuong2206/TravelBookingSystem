@@ -1,5 +1,4 @@
 package com.dmv.pojo;
-
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,51 +12,36 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import java.io.Serializable;
 import java.util.Date;
-
-/**
- *
- * @author Do Minh Vuong
- */
 @Entity
 @Table(name = "review")
 public class Review implements Serializable {
     private static final long serialVersionUID = 1L;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-
     @Basic(optional = false)
     @Column(name = "rating")
     private int rating;
-
     @Column(name = "comment")
     private String comment;
-
     @Column(name = "created_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
-
     @Column(name = "reply_text")
     private String replyText;
-
     @Column(name = "reply_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date replyDate;
-
     @JoinColumn(name = "service_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private TravelService serviceId;
-
     @JoinColumn(name = "customer_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private User customerId;
-
     public Review() {
     }
-
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
     public int getRating() { return rating; }

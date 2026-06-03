@@ -1,5 +1,4 @@
 package com.dmv.pojo;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
@@ -14,46 +13,32 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import java.io.Serializable;
 import java.util.Date;
-
-/**
- *
- * @author Do Minh Vuong
- */
 @Entity
 @Table(name = "payment_transaction")
 @JsonIgnoreProperties(value = {"bookingId.paymentTransactionCollection"})
 public class PaymentTransaction implements Serializable {
     private static final long serialVersionUID = 1L;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-
     @Column(name = "amount")
     private Long amount;
-
     @Column(name = "payment_method")
     private String paymentMethod;
-
     @Column(name = "provider_transaction_id")
     private String providerTransactionId;
-
     @Column(name = "status")
     private String status;
-
     @Column(name = "created_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
-
     @JoinColumn(name = "booking_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private Booking bookingId;
-
     public PaymentTransaction() {
     }
-
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
     public Long getAmount() { return amount; }

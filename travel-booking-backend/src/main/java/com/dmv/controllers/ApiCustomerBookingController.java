@@ -1,5 +1,4 @@
 package com.dmv.controllers;
-
 import com.dmv.pojo.Booking;
 import com.dmv.service.BookingService;
 import java.security.Principal;
@@ -17,14 +16,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 @RestController
 @RequestMapping("/api/secure/bookings")
 @CrossOrigin
 public class ApiCustomerBookingController {
     @Autowired
     private BookingService bookingService;
-
     @PostMapping
     public ResponseEntity<?> createBooking(@RequestBody Map<String, String> params, Principal principal) {
         try {
@@ -34,17 +31,14 @@ public class ApiCustomerBookingController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
-
     @GetMapping
     public ResponseEntity<List<Booking>> getMyBookings(@RequestParam Map<String, String> params, Principal principal) {
         return ResponseEntity.ok(this.bookingService.getMyBookings(principal.getName(), params));
     }
-
     @GetMapping("/count")
     public ResponseEntity<Long> countMyBookings(Principal principal) {
         return ResponseEntity.ok(this.bookingService.countMyBookings(principal.getName()));
     }
-
     @GetMapping("/{id}")
     public ResponseEntity<?> getMyBookingById(@PathVariable(value = "id") int id, Principal principal) {
         Booking booking = this.bookingService.getMyBookingById(id, principal.getName());
@@ -52,7 +46,6 @@ public class ApiCustomerBookingController {
             return ResponseEntity.notFound().build();
         return ResponseEntity.ok(booking);
     }
-
     @PutMapping("/{id}/cancel")
     public ResponseEntity<?> cancelMyBooking(@PathVariable(value = "id") int id, Principal principal) {
         try {

@@ -1,5 +1,4 @@
 package com.dmv.controllers;
-
 import com.dmv.pojo.Review;
 import com.dmv.service.ReviewService;
 import java.security.Principal;
@@ -18,39 +17,33 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 @RestController
 @RequestMapping("/api")
 @CrossOrigin
 public class ApiReviewController {
     @Autowired
     private ReviewService reviewService;
-
     @GetMapping({"/services/{serviceId}/comments", "/services/{serviceId}/reviews"})
     public ResponseEntity<List<Review>> list(@PathVariable(value = "serviceId") int id, @RequestParam Map<String, String> params) {
         Map<String, String> filters = new HashMap<>(params);
         filters.put("serviceId", String.valueOf(id));
         return ResponseEntity.ok(this.reviewService.getReviews(filters));
     }
-
     @GetMapping({"/services/{serviceId}/comments/count", "/services/{serviceId}/reviews/count"})
     public ResponseEntity<Long> count(@PathVariable(value = "serviceId") int id) {
         Map<String, String> filters = new HashMap<>();
         filters.put("serviceId", String.valueOf(id));
         return ResponseEntity.ok(this.reviewService.countReviews(filters));
     }
-
     @GetMapping("/services/{serviceId}/rating-summary")
     public ResponseEntity<Map<String, Object>> ratingSummary(@PathVariable(value = "serviceId") int id) {
         Map<String, String> filters = new HashMap<>();
         filters.put("serviceId", String.valueOf(id));
-
         Map<String, Object> result = new HashMap<>();
         result.put("averageRating", this.reviewService.averageRating(id));
         result.put("totalReviews", this.reviewService.countReviews(filters));
         return ResponseEntity.ok(result);
     }
-
     @PostMapping({"/secure/services/{serviceId}/comments", "/secure/services/{serviceId}/reviews"})
     public ResponseEntity<?> addReview(@RequestBody Map<String, String> params, @PathVariable(value = "serviceId") int id, Principal principal) {
         try {
@@ -59,12 +52,10 @@ public class ApiReviewController {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
-
     @GetMapping("/secure/provider/reviews")
     public ResponseEntity<List<Review>> providerReviews(@RequestParam Map<String, String> params, Principal principal) {
         return ResponseEntity.ok(this.reviewService.getProviderReviews(principal.getName(), params));
     }
-
     @PutMapping("/secure/provider/reviews/{reviewId}/reply")
     public ResponseEntity<?> reply(@PathVariable(value = "reviewId") int reviewId, @RequestBody Map<String, String> params, Principal principal) {
         try {

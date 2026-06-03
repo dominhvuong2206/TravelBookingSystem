@@ -1,5 +1,4 @@
 package com.dmv.service.impl;
-
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.dmv.pojo.TravelService;
@@ -16,11 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
-/**
- *
- * @author Do Minh Vuong
- */
 @Service
 public class TravelServiceServiceImpl implements TravelServiceService {
     @Autowired
@@ -29,17 +23,14 @@ public class TravelServiceServiceImpl implements TravelServiceService {
     private UserRepository userRepo;
     @Autowired
     private Cloudinary cloudinary;
-
     @Override
     public List<TravelService> getTravelServices(Map<String, String> params) {
         return this.travelServiceRepo.getTravelServices(params);
     }
-
     @Override
     public Long countTravelServices(Map<String, String> params) {
         return this.travelServiceRepo.countTravelServices(params);
     }
-
     @Override
     public void addOrUpdateTravelService(TravelService p) {
         if (p.getFile() != null && !p.getFile().isEmpty()) {
@@ -50,7 +41,6 @@ public class TravelServiceServiceImpl implements TravelServiceService {
                 Logger.getLogger(TravelServiceServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-
         if (p.getProviderId() == null) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
@@ -61,15 +51,12 @@ public class TravelServiceServiceImpl implements TravelServiceService {
                 p.setProviderId(fallbackProvider);
             }
         }
-
         this.travelServiceRepo.addOrUpdateTravelService(p);
     }
-
     @Override
     public TravelService getTravelServiceById(int id) {
         return this.travelServiceRepo.getTravelServiceById(id);
     }
-
     @Override
     public void deleteTravelService(int id) {
         this.travelServiceRepo.deleteTravelService(id);

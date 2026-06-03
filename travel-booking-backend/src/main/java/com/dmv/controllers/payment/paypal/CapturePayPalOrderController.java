@@ -1,5 +1,4 @@
 package com.dmv.controllers.payment.paypal;
-
 import java.util.Map;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
-
 @RestController
 @RequestMapping("/api/secure/payments/paypal/capture")
 public class CapturePayPalOrderController extends PayPalPaymentControllerSupport {
@@ -26,7 +24,6 @@ public class CapturePayPalOrderController extends PayPalPaymentControllerSupport
             String clientId = property("paypal.client.id");
             String clientSecret = property("paypal.client.secret");
             RestTemplate rest = new RestTemplate();
-
             HttpHeaders tokenHeaders = new HttpHeaders();
             tokenHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
             tokenHeaders.set("Authorization", "Basic " + basicAuth(clientId, clientSecret));
@@ -38,7 +35,6 @@ public class CapturePayPalOrderController extends PayPalPaymentControllerSupport
                     new HttpEntity<>(tokenBody, tokenHeaders),
                     new ParameterizedTypeReference<Map<String, Object>>() {});
             String accessToken = (String) tokenRes.getBody().get("access_token");
-
             HttpHeaders captureHeaders = new HttpHeaders();
             captureHeaders.setContentType(MediaType.APPLICATION_JSON);
             captureHeaders.set("Authorization", "Bearer " + accessToken);
@@ -49,13 +45,11 @@ public class CapturePayPalOrderController extends PayPalPaymentControllerSupport
                     new ParameterizedTypeReference<Map<String, Object>>() {});
             Map<String, Object> captureData = captureRes.getBody();
             String status = captureData != null ? (String) captureData.get("status") : "UNKNOWN";
-
             if ("COMPLETED".equalsIgnoreCase(status)) {
                 Integer bookingId = extractBookingId(captureData);
                 if (bookingId != null)
                     completePaidBooking(bookingId, paypalOrderId);
             }
-
             return ResponseEntity.ok(Map.of("status", status));
         } catch (RestClientResponseException e) {
             if (e.getResponseBodyAsString() != null && e.getResponseBodyAsString().contains("ORDER_ALREADY_CAPTURED")) {

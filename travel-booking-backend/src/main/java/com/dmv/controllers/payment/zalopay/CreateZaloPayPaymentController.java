@@ -1,5 +1,4 @@
 package com.dmv.controllers.payment.zalopay;
-
 import com.dmv.pojo.Booking;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-
 @RestController
 @RequestMapping("/api/secure/payments/zalopay/create")
 public class CreateZaloPayPaymentController extends ZaloPayPaymentControllerSupport {
@@ -39,10 +37,8 @@ public class CreateZaloPayPaymentController extends ZaloPayPaymentControllerSupp
             String description = "Travel Booking - " + booking.getServiceNameSnapshot();
             String callbackUrl = backendUrl() + "/api/payments/zalopay/callback";
             String key1 = property("zalopay.key1");
-
             String macData = appId + "|" + appTransId + "|" + appUser + "|" + amount + "|" + appTime + "|" + embedData + "|" + item;
             String mac = hmacSHA256(key1, macData);
-
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
             MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
@@ -57,7 +53,6 @@ public class CreateZaloPayPaymentController extends ZaloPayPaymentControllerSupp
             params.add("bank_code", "zalopayapp");
             params.add("callback_url", callbackUrl);
             params.add("mac", mac);
-
             ResponseEntity<Map> res = new RestTemplate().postForEntity(
                     property("zalopay.api.url"),
                     new HttpEntity<>(params, headers),
@@ -71,7 +66,6 @@ public class CreateZaloPayPaymentController extends ZaloPayPaymentControllerSupp
                 errorBody.put("detail", res.getBody());
                 return ResponseEntity.status(502).body(errorBody);
             }
-
             return ResponseEntity.ok(Map.of("payUrl", orderUrl.toString(), "appTransId", appTransId));
         } catch (Exception e) {
             if (payableBooking)
@@ -79,18 +73,15 @@ public class CreateZaloPayPaymentController extends ZaloPayPaymentControllerSupp
             return ResponseEntity.status(502).body(Map.of("error", e.getMessage()));
         }
     }
-
     private String zaloPayErrorMessage(Map body) {
         if (body != null) {
             Object subReturnMessage = body.get("sub_return_message");
             if (subReturnMessage != null && !subReturnMessage.toString().isBlank())
                 return "ZaloPay: " + subReturnMessage;
-
             Object returnMessage = body.get("return_message");
             if (returnMessage != null && !returnMessage.toString().isBlank())
                 return "ZaloPay: " + returnMessage;
         }
-
         return "ZaloPay không trả về link thanh toán.";
     }
 }

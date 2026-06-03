@@ -1,5 +1,4 @@
 package com.dmv.controllers.payment.momo;
-
 import com.dmv.pojo.Booking;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -9,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-
 @RestController
 @RequestMapping("/api/secure/payments/momo/create")
 public class CreateMomoPaymentController extends MomoPaymentControllerSupport {
@@ -22,7 +20,6 @@ public class CreateMomoPaymentController extends MomoPaymentControllerSupport {
             Booking booking = requirePayableBooking(bookingId, "MOMO");
             payableBooking = true;
             long amount = amountOf(booking);
-
             String partnerCode = property("momo.partner.code", "MOMO");
             String accessKey = property("momo.access.key");
             String secretKey = property("momo.secret.key");
@@ -33,13 +30,11 @@ public class CreateMomoPaymentController extends MomoPaymentControllerSupport {
             String ipnUrl = backendUrl() + "/api/payments/momo/ipn";
             String extraData = "";
             String requestType = "payWithMethod";
-
             String raw = "accessKey=" + accessKey + "&amount=" + amount + "&extraData=" + extraData
                     + "&ipnUrl=" + ipnUrl + "&orderId=" + orderId + "&orderInfo=" + orderInfo
                     + "&partnerCode=" + partnerCode + "&redirectUrl=" + redirectUrl
                     + "&requestId=" + requestId + "&requestType=" + requestType;
             String signature = hmacSHA256(secretKey, raw);
-
             Map<String, Object> req = new LinkedHashMap<>();
             req.put("partnerCode", partnerCode);
             req.put("accessKey", accessKey);
@@ -53,7 +48,6 @@ public class CreateMomoPaymentController extends MomoPaymentControllerSupport {
             req.put("requestType", requestType);
             req.put("signature", signature);
             req.put("lang", "vi");
-
             ResponseEntity<Map> res = new RestTemplate().postForEntity(property("momo.api.url"), req, Map.class);
             Object payUrl = res.getBody() != null ? res.getBody().get("payUrl") : null;
             if (payUrl == null) {
@@ -63,7 +57,6 @@ public class CreateMomoPaymentController extends MomoPaymentControllerSupport {
                         "detail", res.getBody()
                 ));
             }
-
             return ResponseEntity.ok(Map.of("payUrl", payUrl.toString(), "orderId", orderId));
         } catch (Exception e) {
             if (payableBooking)

@@ -1,5 +1,4 @@
 package com.dmv.pojo;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Basic;
 import jakarta.persistence.CascadeType;
@@ -17,66 +16,46 @@ import jakarta.persistence.TemporalType;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
-
-/**
- *
- * @author Do Minh Vuong
- */
 @Entity
 @Table(name = "booking")
 public class Booking implements Serializable {
     private static final long serialVersionUID = 1L;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-
     @Basic(optional = false)
     @Column(name = "service_name_snapshot")
     private String serviceNameSnapshot;
-
     @Column(name = "unit_price")
     private Long unitPrice;
-
     @Column(name = "quantity")
     private Integer quantity;
-
     @Column(name = "total_price")
     private Long totalPrice;
-
     @Column(name = "status")
     private String status;
-
     @Column(name = "payment_method")
     private String paymentMethod;
-
     @Column(name = "payment_status")
     private String paymentStatus;
-
     @Column(name = "note")
     private String note;
-
     @Column(name = "created_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
-
     @JoinColumn(name = "service_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private TravelService serviceId;
-
     @JoinColumn(name = "customer_id", referencedColumnName = "id")
     @ManyToOne(optional = false)
     private User customerId;
-
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "bookingId")
     @JsonIgnore
     private Collection<PaymentTransaction> paymentTransactionCollection;
-
     public Booking() {
     }
-
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
     public String getServiceNameSnapshot() { return serviceNameSnapshot; }

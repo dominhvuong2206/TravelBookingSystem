@@ -1,5 +1,4 @@
 package com.dmv.pojo;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
@@ -13,11 +12,6 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.util.Collection;
-
-/**
- *
- * @author Do Minh Vuong
- */
 @Entity
 @Table(name = "service_category")
 @NamedQueries({
@@ -25,38 +19,29 @@ import java.util.Collection;
 })
 public class ServiceCategory implements Serializable {
     private static final long serialVersionUID = 1L;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-
     @Basic(optional = false)
     @Column(name = "name")
     private String name;
-
     @Basic(optional = false)
     @Column(name = "slug")
     private String slug;
-
     @Column(name = "description")
     private String description;
-
     @Column(name = "active")
     private Boolean active;
-
     @JsonIgnore
     @OneToMany(mappedBy = "categoryId")
     private Collection<TravelService> travelServiceCollection;
-
     public ServiceCategory() {
     }
-
     public ServiceCategory(Integer id) {
         this.id = id;
     }
-
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
     public String getName() { return name; }

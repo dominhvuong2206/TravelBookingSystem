@@ -1,9 +1,7 @@
 package com.dmv.repository;
-
 import com.dmv.pojo.PaymentTransaction;
 import java.util.List;
 import java.util.Map;
-
 public interface PaymentTransactionRepository {
     PaymentTransaction addTransaction(PaymentTransaction transaction);
     PaymentTransaction getTransactionById(int id);

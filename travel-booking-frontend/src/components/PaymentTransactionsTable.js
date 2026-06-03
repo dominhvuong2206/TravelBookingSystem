@@ -135,7 +135,7 @@ const PaymentTransactionsTable = ({
                         </td>
                         <td>{p.createdDate ? new Date(p.createdDate).toLocaleString("vi-VN") : ""}</td>
                         {canMarkPaid && <td>
-                            {p.status !== "PAID" && <Button size="sm" variant="success" onClick={() => markPaid(p.id)}>
+                            {p.bookingId?.status !== "CANCELLED" && p.status !== "PAID" && <Button size="sm" variant="success" onClick={() => markPaid(p.id)}>
                                 Xác nhận đã thanh toán
                             </Button>}
                         </td>}

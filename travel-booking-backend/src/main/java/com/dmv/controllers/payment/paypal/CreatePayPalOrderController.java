@@ -22,9 +22,12 @@ import org.springframework.web.client.RestTemplate;
 public class CreatePayPalOrderController extends PayPalPaymentControllerSupport {
     @PostMapping
     public ResponseEntity<?> create(@RequestBody Map<String, Object> body) {
+        int bookingId = 0;
+        boolean payableBooking = false;
         try {
-            int bookingId = Integer.parseInt(body.get("bookingId").toString());
+            bookingId = Integer.parseInt(body.get("bookingId").toString());
             Booking booking = requirePayableBooking(bookingId, "PAYPAL");
+            payableBooking = true;
             String clientId = property("paypal.client.id");
             String clientSecret = property("paypal.client.secret");
             RestTemplate rest = new RestTemplate();
@@ -71,11 +74,15 @@ public class CreatePayPalOrderController extends PayPalPaymentControllerSupport 
                     .map(link -> link.get("href"))
                     .orElse(null);
 
-            if (payUrl == null)
-                return ResponseEntity.status(502).body(Map.of("error", "PayPal không trả về link thanh toán."));
+            if (payUrl == null) {
+                failBookingPayment(bookingId, null);
+                return ResponseEntity.status(502).body(Map.of("error", "PayPal khong tra ve link thanh toan."));
+            }
 
             return ResponseEntity.ok(Map.of("payUrl", payUrl, "orderId", orderRes.getBody().get("id")));
         } catch (Exception e) {
+            if (payableBooking)
+                failBookingPayment(bookingId, null);
             return ResponseEntity.status(502).body(Map.of("error", e.getMessage()));
         }
     }

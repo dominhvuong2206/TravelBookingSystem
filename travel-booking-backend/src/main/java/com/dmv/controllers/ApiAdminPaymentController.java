@@ -33,9 +33,13 @@ public class ApiAdminPaymentController {
 
     @PutMapping("/{transactionId}/mark-paid")
     public ResponseEntity<?> markPaid(@PathVariable(value = "transactionId") int transactionId) {
-        PaymentTransaction transaction = this.paymentTransactionService.markAdminTransactionPaid(transactionId);
-        if (transaction == null)
-            return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(transaction);
+        try {
+            PaymentTransaction transaction = this.paymentTransactionService.markAdminTransactionPaid(transactionId);
+            if (transaction == null)
+                return ResponseEntity.notFound().build();
+            return ResponseEntity.ok(transaction);
+        } catch (IllegalStateException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
     }
 }

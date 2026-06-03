@@ -4,9 +4,9 @@ const paymentReturnStyles = {
         margin: "48px auto",
     },
     card: {
-        border: "1px solid #dbe4f0",
-        borderRadius: 10,
-        boxShadow: "0 12px 34px rgba(15, 23, 42, 0.08)",
+        border: "1px solid #e2e8f0",
+        borderRadius: 8,
+        boxShadow: "none",
     },
     body: {
         padding: 32,
@@ -49,7 +49,7 @@ const paymentReturnStyles = {
     },
     item: {
         border: "1px solid #e2e8f0",
-        borderRadius: 10,
+        borderRadius: 8,
         padding: "14px 16px",
         background: "#f8fafc",
     },
@@ -66,16 +66,16 @@ const paymentReturnStyles = {
         overflowWrap: "anywhere",
     },
     highlight: {
-        color: "#dc2626",
+        color: "#ea580c",
         fontSize: 22,
         fontWeight: 800,
     },
     note: {
-        border: "1px solid #bfdbfe",
-        borderRadius: 10,
+        border: "1px solid #e2e8f0",
+        borderRadius: 8,
         padding: "14px 16px",
-        background: "#eff6ff",
-        color: "#1e3a8a",
+        background: "#f8fafc",
+        color: "#334155",
         marginBottom: 22,
     },
     actions: {

@@ -24,8 +24,8 @@ const providerStatsStyles = {
     },
     card: {
         border: "1px solid #e2e8f0",
-        borderRadius: 10,
-        boxShadow: "0 10px 26px rgba(15, 23, 42, 0.06)",
+        borderRadius: 8,
+        boxShadow: "none",
     },
     metricLabel: {
         color: "#64748b",
@@ -88,8 +88,8 @@ const providerStatsStyles = {
         minHeight: 280,
         padding: "18px 10px 6px",
         border: "1px solid #e2e8f0",
-        borderRadius: 10,
-        background: "linear-gradient(180deg, #f8fafc 0%, #ffffff 100%)",
+        borderRadius: 8,
+        background: "#ffffff",
         display: "grid",
         gridTemplateColumns: "repeat(auto-fit, minmax(72px, 1fr))",
         gap: 12,
@@ -116,8 +116,8 @@ const providerStatsStyles = {
         width: "100%",
         maxWidth: 48,
         height: 150,
-        borderRadius: 12,
-        background: "#dbeafe",
+        borderRadius: 8,
+        background: "#f1f5f9",
         display: "flex",
         alignItems: "flex-end",
         overflow: "hidden",
@@ -125,8 +125,8 @@ const providerStatsStyles = {
     verticalBar: {
         width: "100%",
         minHeight: 6,
-        borderRadius: "12px 12px 0 0",
-        background: "linear-gradient(180deg, #2563eb 0%, #0ea5e9 100%)",
+        borderRadius: "8px 8px 0 0",
+        background: "#2563eb",
         transition: "height 0.2s ease",
     },
     verticalLabel: {
@@ -139,8 +139,8 @@ const providerStatsStyles = {
     serviceChart: {
         padding: 18,
         border: "1px solid #e2e8f0",
-        borderRadius: 10,
-        background: "#f8fafc",
+        borderRadius: 8,
+        background: "#ffffff",
         display: "flex",
         flexDirection: "column",
         gap: 14,
@@ -167,14 +167,14 @@ const providerStatsStyles = {
     serviceBarTrack: {
         height: 26,
         borderRadius: 999,
-        background: "#dbeafe",
+        background: "#f1f5f9",
         overflow: "hidden",
     },
     serviceBarFill: {
         height: "100%",
         minWidth: 8,
         borderRadius: 999,
-        background: "linear-gradient(90deg, #2563eb 0%, #06b6d4 100%)",
+        background: "#2563eb",
         transition: "width 0.2s ease",
     },
     serviceChartValue: {

@@ -11,7 +11,7 @@ const bookingStyles = {
         border: "1px solid #e2e8f0",
         borderRadius: 8,
         overflow: "hidden",
-        boxShadow: "0 10px 28px rgba(15, 23, 42, 0.07)",
+        boxShadow: "none",
     },
     image: {
         height: 330,
@@ -52,7 +52,7 @@ const bookingStyles = {
         alignItems: "center",
         justifyContent: "center",
         color: "#1d4ed8",
-        background: "#dbeafe",
+        background: "#eff6ff",
         flex: "0 0 auto",
     },
     infoLabel: {
@@ -67,7 +67,7 @@ const bookingStyles = {
         border: "1px solid #e2e8f0",
         borderRadius: 8,
         overflow: "hidden",
-        boxShadow: "0 10px 28px rgba(15, 23, 42, 0.07)",
+        boxShadow: "none",
         position: "sticky",
         top: 18,
     },
@@ -83,8 +83,8 @@ const bookingStyles = {
         marginBottom: 18,
     },
     totalBox: {
-        border: "1px solid #fed7aa",
-        background: "#fff7ed",
+        border: "1px solid #e2e8f0",
+        background: "#f8fafc",
         borderRadius: 8,
         padding: 16,
         marginBottom: 16,

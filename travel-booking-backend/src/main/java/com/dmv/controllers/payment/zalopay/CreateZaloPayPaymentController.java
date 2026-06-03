@@ -3,6 +3,7 @@ package com.dmv.controllers.payment.zalopay;
 import com.dmv.pojo.Booking;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -21,9 +22,12 @@ import org.springframework.web.client.RestTemplate;
 public class CreateZaloPayPaymentController extends ZaloPayPaymentControllerSupport {
     @PostMapping
     public ResponseEntity<?> create(@RequestBody Map<String, Object> body) {
+        int bookingId = 0;
+        boolean payableBooking = false;
         try {
-            int bookingId = Integer.parseInt(body.get("bookingId").toString());
+            bookingId = Integer.parseInt(body.get("bookingId").toString());
             Booking booking = requirePayableBooking(bookingId, "ZALOPAY");
+            payableBooking = true;
             int appId = Integer.parseInt(property("zalopay.app.id", "2553"));
             long amount = amountOf(booking);
             long appTime = System.currentTimeMillis();
@@ -60,12 +64,33 @@ public class CreateZaloPayPaymentController extends ZaloPayPaymentControllerSupp
                     Map.class
             );
             Object orderUrl = res.getBody() != null ? res.getBody().get("order_url") : null;
-            if (orderUrl == null)
-                return ResponseEntity.status(502).body(Map.of("error", "ZaloPay không trả về link thanh toán.", "detail", res.getBody()));
+            if (orderUrl == null) {
+                failBookingPayment(bookingId, appTransId);
+                Map<String, Object> errorBody = new LinkedHashMap<>();
+                errorBody.put("error", zaloPayErrorMessage(res.getBody()));
+                errorBody.put("detail", res.getBody());
+                return ResponseEntity.status(502).body(errorBody);
+            }
 
             return ResponseEntity.ok(Map.of("payUrl", orderUrl.toString(), "appTransId", appTransId));
         } catch (Exception e) {
+            if (payableBooking)
+                failBookingPayment(bookingId, null);
             return ResponseEntity.status(502).body(Map.of("error", e.getMessage()));
         }
+    }
+
+    private String zaloPayErrorMessage(Map body) {
+        if (body != null) {
+            Object subReturnMessage = body.get("sub_return_message");
+            if (subReturnMessage != null && !subReturnMessage.toString().isBlank())
+                return "ZaloPay: " + subReturnMessage;
+
+            Object returnMessage = body.get("return_message");
+            if (returnMessage != null && !returnMessage.toString().isBlank())
+                return "ZaloPay: " + returnMessage;
+        }
+
+        return "ZaloPay khong tra ve link thanh toan.";
     }
 }

@@ -3,10 +3,9 @@ const headerStyles = {
         position: "sticky",
         top: 0,
         zIndex: 1030,
-        background: "linear-gradient(180deg, #eff6ff 0%, #f8fbff 72%, #ffffff 100%)",
-        borderBottom: "1px solid #dbeafe",
-        boxShadow: "0 12px 32px rgba(37, 99, 235, 0.08)",
-        backdropFilter: "blur(10px)",
+        background: "#f8fafc",
+        borderBottom: "1px solid #e2e8f0",
+        boxShadow: "none",
     },
     brand: {
         display: "inline-flex",
@@ -29,7 +28,7 @@ const headerStyles = {
     },
     navbar: {
         background: "transparent",
-        minHeight: 70,
+        minHeight: 66,
     },
     navLink: {
         display: "inline-flex",
@@ -62,12 +61,12 @@ const headerStyles = {
         left: 12,
         top: "50%",
         transform: "translateY(-50%)",
-        color: "#2563eb",
+        color: "#64748b",
     },
     searchInput: {
         paddingLeft: 36,
-        borderRadius: 12,
-        borderColor: "#cbdff8",
+        borderRadius: 8,
+        borderColor: "#e2e8f0",
         minHeight: 42,
     },
     avatar: {
@@ -76,7 +75,7 @@ const headerStyles = {
         objectFit: "cover",
         borderRadius: "50%",
         marginRight: 8,
-        border: "2px solid #dbeafe",
+        border: "1px solid #e2e8f0",
     },
     userLink: {
         display: "inline-flex",
@@ -98,29 +97,29 @@ const headerStyles = {
         display: "inline-flex",
         alignItems: "center",
         gap: 8,
-        border: "1px solid #bfdbfe",
-        borderRadius: 14,
+        border: "1px solid #e2e8f0",
+        borderRadius: 8,
         padding: "8px 12px",
-        background: "linear-gradient(180deg, #ffffff 0%, #f8fbff 100%)",
+        background: "#ffffff",
         color: "#0f172a",
         fontWeight: 750,
         cursor: "pointer",
         whiteSpace: "nowrap",
-        boxShadow: "0 8px 20px rgba(37, 99, 235, 0.08)",
+        boxShadow: "none",
     },
     userMenu: {
         minWidth: 230,
-        border: "1px solid #bfdbfe",
-        borderRadius: 14,
-        boxShadow: "0 18px 40px rgba(37, 99, 235, 0.16)",
+        border: "1px solid #e2e8f0",
+        borderRadius: 8,
+        boxShadow: "0 8px 20px rgba(15, 23, 42, 0.08)",
         padding: 8,
     },
     userMenuHeader: {
         padding: "10px 12px 12px",
-        borderBottom: "1px solid #dbeafe",
+        borderBottom: "1px solid #e2e8f0",
         marginBottom: 6,
         background: "#f8fbff",
-        borderRadius: 10,
+        borderRadius: 6,
     },
     authLink: {
         display: "inline-flex",
@@ -140,12 +139,12 @@ export const headerResponsive = `
   padding: 9px 10px;
 }
 .app-header .dropdown-menu {
-  border-color: #bfdbfe;
-  border-radius: 14px;
-  box-shadow: 0 18px 40px rgba(37, 99, 235, 0.14);
+  border-color: #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
 }
 .app-header .dropdown-item {
-  border-radius: 10px;
+  border-radius: 6px;
   padding: 8px 10px;
 }
 .app-header-search .form-control:focus {

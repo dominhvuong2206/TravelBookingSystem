@@ -1,9 +1,11 @@
 package com.dmv.service.impl;
 
 import com.dmv.pojo.PaymentTransaction;
+import com.dmv.pojo.TravelService;
 import com.dmv.pojo.User;
 import com.dmv.repository.BookingRepository;
 import com.dmv.repository.PaymentTransactionRepository;
+import com.dmv.repository.TravelServiceRepository;
 import com.dmv.repository.UserRepository;
 import com.dmv.service.PaymentTransactionService;
 import java.util.HashMap;
@@ -20,6 +22,8 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
     private UserRepository userRepo;
     @Autowired
     private BookingRepository bookingRepo;
+    @Autowired
+    private TravelServiceRepository travelServiceRepo;
 
     @Override
     public List<PaymentTransaction> getMyTransactions(String username, Map<String, String> params) {
@@ -118,13 +122,30 @@ public class PaymentTransactionServiceImpl implements PaymentTransactionService 
             transaction.setProviderTransactionId(providerTransactionId);
 
         transaction.setStatus("FAILED");
+        transaction.getBookingId().setPaymentStatus("FAILED");
+        if ("PENDING".equals(transaction.getBookingId().getStatus())) {
+            transaction.getBookingId().setStatus("CANCELLED");
+            restoreSlots(transaction);
+        }
+        this.bookingRepo.updateBooking(transaction.getBookingId());
         return this.paymentTransactionRepo.updateTransaction(transaction);
     }
 
     private PaymentTransaction markPaid(PaymentTransaction transaction) {
+        if ("CANCELLED".equals(transaction.getBookingId().getStatus()))
+            throw new IllegalStateException("Khong the xac nhan thanh toan cho booking da huy.");
+
         transaction.setStatus("PAID");
         transaction.getBookingId().setPaymentStatus("PAID");
         this.bookingRepo.updateBooking(transaction.getBookingId());
         return this.paymentTransactionRepo.updateTransaction(transaction);
+    }
+
+    private void restoreSlots(PaymentTransaction transaction) {
+        TravelService service = transaction.getBookingId().getServiceId();
+        if (service.getAvailableSlots() != null) {
+            service.setAvailableSlots(service.getAvailableSlots() + transaction.getBookingId().getQuantity());
+            this.travelServiceRepo.addOrUpdateTravelService(service);
+        }
     }
 }

@@ -44,17 +44,25 @@ public class ApiProviderBookingController {
 
     @PutMapping("/bookings/{bookingId}/cancel")
     public ResponseEntity<?> cancelBooking(@PathVariable(value = "bookingId") int bookingId, Principal principal) {
-        Booking booking = this.bookingService.cancelProviderBooking(bookingId, principal.getName());
-        if (booking == null)
-            return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(booking);
+        try {
+            Booking booking = this.bookingService.cancelProviderBooking(bookingId, principal.getName());
+            if (booking == null)
+                return ResponseEntity.notFound().build();
+            return ResponseEntity.ok(booking);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
     }
 
     @PutMapping("/bookings/{bookingId}/mark-paid")
     public ResponseEntity<?> markPaid(@PathVariable(value = "bookingId") int bookingId, Principal principal) {
-        Booking booking = this.bookingService.markProviderBookingPaid(bookingId, principal.getName());
-        if (booking == null)
-            return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(booking);
+        try {
+            Booking booking = this.bookingService.markProviderBookingPaid(bookingId, principal.getName());
+            if (booking == null)
+                return ResponseEntity.notFound().build();
+            return ResponseEntity.ok(booking);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
     }
 }

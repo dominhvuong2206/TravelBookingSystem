@@ -16,10 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class CreateStripeCheckoutController extends StripePaymentControllerSupport {
     @PostMapping
     public ResponseEntity<?> create(@RequestBody Map<String, Object> body) {
+        int bookingId = 0;
+        boolean payableBooking = false;
         try {
             initStripe();
-            int bookingId = Integer.parseInt(body.get("bookingId").toString());
+            bookingId = Integer.parseInt(body.get("bookingId").toString());
             Booking booking = requirePayableBooking(bookingId, "STRIPE");
+            payableBooking = true;
 
             SessionCreateParams params = SessionCreateParams.builder()
                     .setMode(SessionCreateParams.Mode.PAYMENT)
@@ -42,8 +45,12 @@ public class CreateStripeCheckoutController extends StripePaymentControllerSuppo
             Session session = Session.create(params);
             return ResponseEntity.ok(Map.of("payUrl", session.getUrl(), "sessionId", session.getId()));
         } catch (StripeException e) {
+            if (payableBooking)
+                failBookingPayment(bookingId, null);
             return ResponseEntity.status(502).body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
+            if (payableBooking)
+                failBookingPayment(bookingId, null);
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }

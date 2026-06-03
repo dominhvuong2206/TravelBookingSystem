@@ -5,7 +5,7 @@ const travelChatStyles = {
         bottom: 24,
         height: 48,
         padding: "0 18px",
-        borderRadius: 999,
+        borderRadius: 8,
         border: "1px solid #2563eb",
         background: "#fff",
         color: "#2563eb",
@@ -13,23 +13,24 @@ const travelChatStyles = {
         alignItems: "center",
         gap: 8,
         fontWeight: 750,
-        boxShadow: "0 12px 28px rgba(15, 23, 42, 0.18)",
+        boxShadow: "0 8px 20px rgba(15, 23, 42, 0.12)",
         zIndex: 1200,
     },
     panel: {
         position: "fixed",
         right: 24,
-        bottom: 24,
-        width: 760,
+        top: 112,
+        width: 840,
         maxWidth: "calc(100vw - 32px)",
-        height: 560,
-        maxHeight: "calc(100vh - 80px)",
+        height: "calc(100vh - 136px)",
+        maxHeight: 620,
+        minHeight: 520,
         background: "#fff",
-        border: "1px solid #dbe3ef",
-        borderRadius: 10,
-        boxShadow: "0 22px 60px rgba(15, 23, 42, 0.22)",
+        border: "1px solid #e2e8f0",
+        borderRadius: 8,
+        boxShadow: "0 12px 34px rgba(15, 23, 42, 0.14)",
         display: "grid",
-        gridTemplateColumns: "280px minmax(0, 1fr)",
+        gridTemplateColumns: "320px minmax(0, 1fr)",
         overflow: "hidden",
         zIndex: 1200,
     },
@@ -80,7 +81,7 @@ const travelChatStyles = {
         width: "100%",
         border: 0,
         borderBottom: "1px solid #f1f5f9",
-        background: active ? "#eff6ff" : "#fff",
+        background: active ? "#f8fafc" : "#fff",
         padding: 12,
         textAlign: "left",
         cursor: "pointer",
@@ -91,7 +92,7 @@ const travelChatStyles = {
         width: 42,
         height: 42,
         borderRadius: "50%",
-        background: "#dbeafe",
+        background: "#eff6ff",
         color: "#2563eb",
         display: "flex",
         alignItems: "center",
@@ -186,11 +187,11 @@ const travelChatStyles = {
     },
     bubble: mine => ({
         padding: "9px 12px",
-        borderRadius: mine ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
+        borderRadius: mine ? "12px 12px 4px 12px" : "12px 12px 12px 4px",
         background: mine ? "#2563eb" : "#fff",
         color: mine ? "#fff" : "#0f172a",
         border: mine ? "none" : "1px solid #e2e8f0",
-        boxShadow: "0 6px 14px rgba(15, 23, 42, 0.06)",
+        boxShadow: "none",
         whiteSpace: "pre-wrap",
         overflowWrap: "anywhere",
     }),
@@ -214,7 +215,7 @@ const travelChatStyles = {
         maxHeight: 92,
         resize: "none",
         border: "1px solid #cbd5e1",
-        borderRadius: 10,
+        borderRadius: 8,
         padding: "9px 11px",
         outline: "none",
     },
@@ -222,7 +223,7 @@ const travelChatStyles = {
         width: 42,
         height: 42,
         border: 0,
-        borderRadius: 10,
+        borderRadius: 8,
         background: "#2563eb",
         color: "#fff",
         display: "inline-flex",
@@ -233,9 +234,10 @@ const travelChatStyles = {
         @media (max-width: 768px) {
             .travel-chat-panel {
                 right: 8px !important;
-                bottom: 8px !important;
+                top: 72px !important;
                 width: calc(100vw - 16px) !important;
-                height: calc(100vh - 16px) !important;
+                height: calc(100vh - 88px) !important;
+                min-height: 0 !important;
                 grid-template-columns: 1fr !important;
             }
             .travel-chat-sidebar-hidden {

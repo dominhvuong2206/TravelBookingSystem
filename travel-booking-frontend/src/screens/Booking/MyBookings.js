@@ -16,6 +16,7 @@ const statusBadge = {
 const paymentStatusText = {
     PAID: "Đã thanh toán",
     UNPAID: "Chưa thanh toán",
+    FAILED: "Thanh toán thất bại",
 };
 
 const MyBookings = () => {

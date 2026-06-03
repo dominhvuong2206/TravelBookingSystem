@@ -3,14 +3,14 @@ const revenueChartsStyles = {
         minHeight: 320,
         padding: 14,
         border: "1px solid #e2e8f0",
-        borderRadius: 10,
+        borderRadius: 8,
         background: "#ffffff",
     },
     serviceChartBox: {
         minHeight: 360,
         padding: 14,
         border: "1px solid #e2e8f0",
-        borderRadius: 10,
+        borderRadius: 8,
         background: "#ffffff",
     },
     doughnutBox: {
@@ -20,7 +20,7 @@ const revenueChartsStyles = {
     emptyChart: {
         minHeight: 260,
         border: "1px dashed #cbd5e1",
-        borderRadius: 10,
+        borderRadius: 8,
         background: "#f8fafc",
         color: "#64748b",
         display: "flex",

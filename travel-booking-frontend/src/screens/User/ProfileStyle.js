@@ -38,10 +38,10 @@ const profileStyles = {
     },
     summaryCard: {
         border: "1px solid #e2e8f0",
-        borderRadius: 12,
+        borderRadius: 10,
         padding: 28,
         background: "#fff",
-        boxShadow: "0 18px 44px rgba(15, 23, 42, 0.06)",
+        boxShadow: "none",
         minHeight: "100%",
     },
     avatarWrap: {
@@ -54,8 +54,8 @@ const profileStyles = {
         width: 168,
         height: 168,
         objectFit: "cover",
-        border: "6px solid #f8fafc",
-        boxShadow: "0 12px 26px rgba(15, 23, 42, 0.14)",
+        border: "4px solid #f8fafc",
+        boxShadow: "none",
     },
     avatarFallback: {
         width: 168,
@@ -67,7 +67,7 @@ const profileStyles = {
         background: "#eff6ff",
         color: "#2563eb",
         fontSize: 56,
-        border: "6px solid #f8fafc",
+        border: "4px solid #f8fafc",
     },
     avatarButton: {
         position: "absolute",
@@ -84,7 +84,7 @@ const profileStyles = {
         border: "3px solid #fff",
         cursor: "pointer",
         margin: 0,
-        boxShadow: "0 8px 18px rgba(37, 99, 235, 0.35)",
+        boxShadow: "none",
     },
     name: {
         color: "#0f172a",
@@ -120,10 +120,10 @@ const profileStyles = {
     },
     formCard: {
         border: "1px solid #e2e8f0",
-        borderRadius: 12,
+        borderRadius: 10,
         padding: 28,
         background: "#fff",
-        boxShadow: "0 18px 44px rgba(15, 23, 42, 0.06)",
+        boxShadow: "none",
     },
     formTitleRow: {
         display: "flex",

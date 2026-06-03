@@ -14,7 +14,7 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, ArcElement, Tooltip, Le
 
 export const formatCurrency = (value) => `${Number(value || 0).toLocaleString("vi-VN")} VNĐ`;
 
-const palette = ["#2563eb", "#0ea5e9", "#14b8a6", "#22c55e", "#f59e0b", "#ef4444", "#64748b"];
+const palette = ["#2563eb", "#64748b", "#0f766e", "#16a34a", "#ea580c", "#dc2626", "#94a3b8"];
 
 const hasValues = (items, valueKey = "value") => items.some(item => Number(item[valueKey] || 0) > 0);
 
@@ -34,7 +34,7 @@ export const RevenueBarChart = ({ rows, title = "Doanh thu" }) => {
             label: title,
             data: rows.map(row => Number(row.value || 0)),
             backgroundColor: "#2563eb",
-            borderRadius: 8,
+            borderRadius: 4,
             maxBarThickness: 46,
         }],
     };
@@ -61,8 +61,8 @@ export const CountBarChart = ({ rows, title = "Số booking" }) => {
         datasets: [{
             label: title,
             data: rows.map(row => Number(row.value || 0)),
-            backgroundColor: "#16a34a",
-            borderRadius: 8,
+            backgroundColor: "#64748b",
+            borderRadius: 4,
             maxBarThickness: 46,
         }],
     };
@@ -102,7 +102,7 @@ export const ServiceRevenueChart = ({ services }) => {
             label: "Doanh thu đã thanh toán",
             data: rows.map(item => Number(item.paidRevenue || 0)),
             backgroundColor: rows.map((_, index) => palette[index % palette.length]),
-            borderRadius: 8,
+            borderRadius: 4,
             maxBarThickness: 30,
         }],
     };

@@ -15,9 +15,12 @@ import org.springframework.web.client.RestTemplate;
 public class CreateMomoPaymentController extends MomoPaymentControllerSupport {
     @PostMapping
     public ResponseEntity<?> create(@RequestBody Map<String, Object> body) {
+        int bookingId = 0;
+        boolean payableBooking = false;
         try {
-            int bookingId = Integer.parseInt(body.get("bookingId").toString());
+            bookingId = Integer.parseInt(body.get("bookingId").toString());
             Booking booking = requirePayableBooking(bookingId, "MOMO");
+            payableBooking = true;
             long amount = amountOf(booking);
 
             String partnerCode = property("momo.partner.code", "MOMO");
@@ -53,11 +56,18 @@ public class CreateMomoPaymentController extends MomoPaymentControllerSupport {
 
             ResponseEntity<Map> res = new RestTemplate().postForEntity(property("momo.api.url"), req, Map.class);
             Object payUrl = res.getBody() != null ? res.getBody().get("payUrl") : null;
-            if (payUrl == null)
-                return ResponseEntity.status(502).body(Map.of("error", "MoMo không trả về link thanh toán.", "detail", res.getBody()));
+            if (payUrl == null) {
+                failBookingPayment(bookingId, orderId);
+                return ResponseEntity.status(502).body(Map.of(
+                        "error", "MoMo khong tra ve link thanh toan.",
+                        "detail", res.getBody()
+                ));
+            }
 
             return ResponseEntity.ok(Map.of("payUrl", payUrl.toString(), "orderId", orderId));
         } catch (Exception e) {
+            if (payableBooking)
+                failBookingPayment(bookingId, null);
             return ResponseEntity.status(502).body(Map.of("error", e.getMessage()));
         }
     }

@@ -1,15 +1,15 @@
 const registerStyles = {
     page: {
         padding: "36px 16px 52px",
-        background: "linear-gradient(180deg, #f8fafc 0%, #ffffff 100%)",
+        background: "#f8fafc",
     },
     card: {
         width: "100%",
         maxWidth: 960,
         margin: "0 auto",
         border: "1px solid #e2e8f0",
-        borderRadius: 14,
-        boxShadow: "0 18px 42px rgba(15, 23, 42, 0.1)",
+        borderRadius: 10,
+        boxShadow: "none",
         padding: 28,
         background: "#ffffff",
     },
@@ -22,9 +22,9 @@ const registerStyles = {
     iconWrap: {
         width: 54,
         height: 54,
-        borderRadius: 14,
-        background: "#dcfce7",
-        color: "#16a34a",
+        borderRadius: 10,
+        background: "#eff6ff",
+        color: "#2563eb",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",

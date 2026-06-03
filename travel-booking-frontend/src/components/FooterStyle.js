@@ -1,13 +1,13 @@
 const footerStyles = {
     footer: {
         marginTop: 48,
-        background: "#0f172a",
-        color: "#e2e8f0",
+        background: "#111827",
+        color: "#d1d5db",
     },
     brand: {
         color: "#ffffff",
-        fontSize: "1.5rem",
-        fontWeight: 900,
+        fontSize: "1.35rem",
+        fontWeight: 800,
         marginBottom: 10,
     },
     tagline: {
@@ -36,14 +36,14 @@ const footerStyles = {
         marginBottom: 9,
     },
     icon: {
-        color: "#38bdf8",
+        color: "#60a5fa",
         width: 18,
     },
     newsletterBox: {
-        border: "1px solid rgba(226, 232, 240, 0.16)",
+        border: "1px solid rgba(226, 232, 240, 0.14)",
         borderRadius: 8,
         padding: 18,
-        background: "rgba(15, 23, 42, 0.72)",
+        background: "rgba(255, 255, 255, 0.03)",
     },
     input: {
         borderRadius: 8,
@@ -53,7 +53,7 @@ const footerStyles = {
         display: "inline-flex",
         padding: "5px 9px",
         borderRadius: 6,
-        background: "rgba(255, 255, 255, 0.09)",
+        background: "rgba(255, 255, 255, 0.08)",
         color: "#e2e8f0",
         fontSize: "0.82rem",
         fontWeight: 700,

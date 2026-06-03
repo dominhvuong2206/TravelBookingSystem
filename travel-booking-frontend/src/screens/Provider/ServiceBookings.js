@@ -13,6 +13,13 @@ const statusBadge = {
 const paymentStatusText = {
     PAID: "Đã thanh toán",
     UNPAID: "Chưa thanh toán",
+    FAILED: "Thanh toán thất bại",
+};
+
+const paymentStatusVariant = {
+    PAID: "success",
+    UNPAID: "warning",
+    FAILED: "danger",
 };
 
 const ServiceBookings = () => {
@@ -82,6 +89,8 @@ const ServiceBookings = () => {
             <tbody>
                 {bookings.map(booking => {
                     const status = statusBadge[booking.status] || { bg: "secondary", text: booking.status };
+                    const canMarkPaid = booking.status !== "CANCELLED" && booking.paymentStatus !== "PAID" && booking.paymentStatus !== "FAILED";
+
                     return <tr key={booking.id}>
                         <td>{booking.id}</td>
                         <td>
@@ -92,7 +101,7 @@ const ServiceBookings = () => {
                         <td>{booking.quantity}</td>
                         <td>{Number(booking.totalPrice || 0).toLocaleString()} VNĐ</td>
                         <td>
-                            <Badge bg={booking.paymentStatus === "PAID" ? "success" : "warning"}>
+                            <Badge bg={paymentStatusVariant[booking.paymentStatus] || "secondary"}>
                                 {paymentStatusText[booking.paymentStatus] || booking.paymentStatus}
                             </Badge>
                             <div className="small text-muted">{booking.paymentMethod}</div>
@@ -112,7 +121,7 @@ const ServiceBookings = () => {
                                     () => authApis().put(endpoints["provider-cancel-booking"](booking.id)),
                                     "Đã hủy booking."
                                 )}>Hủy</Button>}
-                                {booking.paymentStatus !== "PAID" && <Button size="sm" variant="outline-primary" onClick={() => action(
+                                {canMarkPaid && <Button size="sm" variant="outline-primary" onClick={() => action(
                                     () => authApis().put(endpoints["provider-mark-booking-paid"](booking.id)),
                                     "Đã đánh dấu thanh toán."
                                 )}>Đã thanh toán</Button>}

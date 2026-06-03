@@ -24,8 +24,8 @@ const adminDashboardStyles = {
     },
     card: {
         border: "1px solid #e2e8f0",
-        borderRadius: 10,
-        boxShadow: "0 10px 26px rgba(15, 23, 42, 0.06)",
+        borderRadius: 8,
+        boxShadow: "none",
     },
     metricLabel: {
         color: "#64748b",

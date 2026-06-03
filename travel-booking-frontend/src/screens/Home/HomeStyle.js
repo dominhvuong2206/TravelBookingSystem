@@ -1,18 +1,18 @@
 const homeStyles = {
     hero: {
         position: "relative",
-        margin: "22px 0 26px",
-        minHeight: 330,
-        borderRadius: 18,
+        margin: "18px 0 24px",
+        minHeight: 300,
+        borderRadius: 10,
         overflow: "hidden",
-        backgroundImage: "linear-gradient(90deg, rgba(15, 23, 42, 0.78) 0%, rgba(37, 99, 235, 0.44) 52%, rgba(14, 165, 233, 0.18) 100%), url(https://images.unsplash.com/photo-1507525428034-b723cf961d3e)",
+        backgroundImage: "linear-gradient(90deg, rgba(15, 23, 42, 0.68) 0%, rgba(15, 23, 42, 0.28) 100%), url(https://images.unsplash.com/photo-1507525428034-b723cf961d3e)",
         backgroundSize: "cover",
         backgroundPosition: "center",
         display: "flex",
         alignItems: "center",
-        padding: "34px 44px",
-        border: "1px solid rgba(191, 219, 254, 0.55)",
-        boxShadow: "0 24px 56px rgba(37, 99, 235, 0.16)",
+        padding: "30px 38px",
+        border: "1px solid #e2e8f0",
+        boxShadow: "none",
     },
     heroContent: {
         maxWidth: 820,
@@ -22,47 +22,46 @@ const homeStyles = {
         display: "inline-flex",
         alignItems: "center",
         gap: 8,
-        background: "rgba(37, 99, 235, 0.28)",
-        border: "1px solid rgba(255,255,255,0.42)",
+        background: "rgba(255, 255, 255, 0.16)",
+        border: "1px solid rgba(255,255,255,0.32)",
         borderRadius: 999,
-        padding: "8px 14px",
+        padding: "7px 12px",
         fontWeight: 700,
         marginBottom: 16,
-        backdropFilter: "blur(8px)",
     },
     heroTitle: {
-        fontSize: "2.55rem",
+        fontSize: "2.35rem",
         lineHeight: 1.12,
-        fontWeight: 850,
+        fontWeight: 800,
         marginBottom: 14,
         maxWidth: 860,
-        textShadow: "0 3px 18px rgba(15, 23, 42, 0.28)",
+        textShadow: "0 2px 10px rgba(15, 23, 42, 0.18)",
     },
     heroSub: {
         maxWidth: 670,
         fontSize: "1.02rem",
         lineHeight: 1.6,
-        color: "#eff6ff",
+        color: "#f8fafc",
         marginBottom: 22,
     },
     heroSearch: {
         maxWidth: 680,
         background: "#ffffff",
-        borderRadius: 14,
-        padding: 10,
+        borderRadius: 8,
+        padding: 8,
         display: "flex",
         alignItems: "stretch",
         gap: 12,
-        border: "1px solid rgba(191, 219, 254, 0.95)",
-        boxShadow: "0 20px 42px rgba(37, 99, 235, 0.22)",
+        border: "1px solid #e2e8f0",
+        boxShadow: "none",
     },
     filterCard: {
-        border: "1px solid #bfdbfe",
-        borderRadius: 16,
-        padding: 22,
-        background: "linear-gradient(180deg, #f8fbff 0%, #eef6ff 100%)",
+        border: "1px solid #e2e8f0",
+        borderRadius: 10,
+        padding: 18,
+        background: "#f8fafc",
         margin: "18px 0 24px",
-        boxShadow: "0 16px 34px rgba(37, 99, 235, 0.08)",
+        boxShadow: "none",
     },
     sectionHeader: {
         display: "flex",
@@ -73,16 +72,16 @@ const homeStyles = {
     },
     sectionTitle: {
         color: "#0f172a",
-        fontWeight: 850,
+        fontWeight: 800,
         margin: 0,
     },
     countText: {
         color: "#2563eb",
         fontWeight: 700,
-        background: "#eff6ff",
-        border: "1px solid #bfdbfe",
-        borderRadius: 999,
-        padding: "7px 12px",
+        background: "transparent",
+        border: "none",
+        borderRadius: 0,
+        padding: 0,
         whiteSpace: "nowrap",
     },
     categoryPills: {
@@ -92,10 +91,10 @@ const homeStyles = {
         marginBottom: 16,
     },
     serviceCard: {
-        border: "1px solid #dbeafe",
-        borderRadius: 16,
+        border: "1px solid #e2e8f0",
+        borderRadius: 10,
         overflow: "hidden",
-        boxShadow: "0 12px 28px rgba(37, 99, 235, 0.08)",
+        boxShadow: "none",
         background: "#ffffff",
     },
     serviceImg: {
@@ -104,7 +103,7 @@ const homeStyles = {
     },
     serviceTitle: {
         color: "#1e293b",
-        fontWeight: 800,
+        fontWeight: 750,
         minHeight: 48,
         fontSize: "1.02rem",
     },
@@ -130,36 +129,28 @@ const homeStyles = {
     },
     ctaBand: {
         marginTop: 28,
-        borderRadius: 16,
+        borderRadius: 10,
         padding: "24px 28px",
-        background: "linear-gradient(135deg, #1d4ed8 0%, #0f172a 100%)",
+        background: "#1e293b",
         color: "#ffffff",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
         gap: 16,
         flexWrap: "wrap",
-        boxShadow: "0 18px 36px rgba(37, 99, 235, 0.18)",
+        boxShadow: "none",
     },
 };
 
 export const homeResponsive = `
-.home-service-card {
-  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-}
-.home-service-card:hover {
-  transform: translateY(-4px);
-  border-color: #93c5fd !important;
-  box-shadow: 0 20px 42px rgba(37, 99, 235, 0.16) !important;
-}
 .home-filter-card .form-label {
-  color: #1e3a8a;
+  color: #334155;
   font-weight: 700;
 }
 .home-filter-card .form-control,
 .home-filter-card .form-select,
 .home-hero-search .form-control {
-  border-color: #cbdff8;
+  border-color: #e2e8f0;
   min-height: 46px;
 }
 .home-filter-card .form-control:focus,

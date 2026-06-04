@@ -17,9 +17,9 @@ const MyServices = () => {
     const [message, setMessage] = useState("");
     const nav = useNavigate();
 
-    const buildQuery = () => {
-        const params = new URLSearchParams({ page: String(page) });
-        Object.entries(filters).forEach(([key, value]) => {
+    const buildQuery = (currentPage = page, currentFilters = filters) => {
+        const params = new URLSearchParams({ page: String(currentPage) });
+        Object.entries(currentFilters).forEach(([key, value]) => {
             if (value)
                 params.set(key, value);
         });
@@ -31,10 +31,10 @@ const MyServices = () => {
         setCategories(res.data);
     };
 
-    const loadServices = async () => {
+    const loadServices = async (currentPage = page, currentFilters = filters) => {
         try {
             setLoading(true);
-            const query = buildQuery();
+            const query = buildQuery(currentPage, currentFilters);
             const [servicesRes, countRes] = await Promise.all([
                 authApis().get(`${endpoints["provider-services"]}?${query}`),
                 authApis().get(`${endpoints["provider-services-count"]}?${query}`),
@@ -51,8 +51,8 @@ const MyServices = () => {
     }, []);
 
     useEffect(() => {
-        loadServices();
-    }, [page]); // eslint-disable-line react-hooks/exhaustive-deps
+        loadServices(page, filters);
+    }, [page]); 
 
     const updateFilter = (field, value) => {
         setFilters(current => ({ ...current, [field]: value }));
@@ -61,18 +61,17 @@ const MyServices = () => {
     const filterServices = (e) => {
         e.preventDefault();
         setPage(1);
-        loadServices();
+        loadServices(1, filters);
     };
 
     const clearFilters = () => {
-        setFilters({ kw: "", cateId: "", status: "" });
+        const cleared = { kw: "", cateId: "", status: "" };
+        setFilters(cleared);
         setPage(1);
+        loadServices(1, cleared);
     };
 
-    useEffect(() => {
-        if (page === 1)
-            loadServices();
-    }, [filters]); 
+
 
     const deleteService = async (service) => {
         if (!window.confirm(`Xóa vĩnh viễn dịch vụ "${service.name}"?`))
@@ -92,8 +91,7 @@ const MyServices = () => {
     const totalPages = Math.max(1, Math.ceil(count / PAGE_SIZE));
     const visiblePages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
-    if (loading)
-        return <div className="text-center mt-5"><Spinner animation="border" /></div>;
+
 
     return <div className="mt-4">
         <div className="d-flex justify-content-between align-items-center mb-3">
@@ -133,7 +131,9 @@ const MyServices = () => {
             </Row>
         </Form>
 
-        {services.length === 0 ? <Alert variant="info">Bạn chưa có dịch vụ nào.</Alert> : <Row className="g-3">
+        {loading && <div className="text-center my-4"><Spinner animation="border" /></div>}
+
+        {!loading && services.length === 0 ? <Alert variant="info">Bạn chưa có dịch vụ nào.</Alert> : !loading && <Row className="g-3">
             {services.map(service => <Col xs={12} md={6} lg={4} key={service.id}>
                 <Card className="h-100">
                     <Card.Img

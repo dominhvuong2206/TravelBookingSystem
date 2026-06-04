@@ -1,6 +1,4 @@
 package com.dmv.configs;
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
 import com.dmv.formatters.CategoryFormatter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;

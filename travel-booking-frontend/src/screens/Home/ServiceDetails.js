@@ -57,14 +57,14 @@ const ServiceDetails = () => {
     const commentPageRef = useRef(1);
     const sentinelRef = useRef(null);
 
-    const loadProduct = async () => {
+    const loadProduct = useCallback(async () => {
         const [serviceRes, ratingRes] = await Promise.all([
             Apis.get(endpoints["product-details"](serviceId)),
             Apis.get(endpoints["rating-summary"](serviceId)),
         ]);
         setProduct(serviceRes.data);
         setRatingSummary(ratingRes.data);
-    };
+    }, [serviceId]);
 
     const loadComments = useCallback(async (pageToLoad, replace = false) => {
         if (loadingRef.current) return;
@@ -129,7 +129,7 @@ const ServiceDetails = () => {
         loadProduct();
         loadComments(1, true);
         loadTotalComments();
-    }, [serviceId]); 
+    }, [loadComments, loadProduct, loadTotalComments]);
 
     useEffect(() => {
         const sentinel = sentinelRef.current;

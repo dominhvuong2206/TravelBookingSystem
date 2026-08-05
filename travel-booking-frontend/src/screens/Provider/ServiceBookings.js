@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { Alert, Badge, Button, Spinner, Table } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 import { authApis, endpoints } from "../../configs/Apis";
@@ -31,7 +31,7 @@ const ServiceBookings = () => {
     const [err, setErr] = useState("");
     const { openBookingChat } = useContext(ChatContext);
 
-    const loadBookings = async () => {
+    const loadBookings = useCallback(async () => {
         try {
             setLoading(true);
             const res = await authApis().get(endpoints["provider-service-bookings"](serviceId));
@@ -42,11 +42,11 @@ const ServiceBookings = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [serviceId]);
 
     useEffect(() => {
         loadBookings();
-    }, [serviceId]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [loadBookings]);
 
     const action = async (request, successMessage) => {
         try {

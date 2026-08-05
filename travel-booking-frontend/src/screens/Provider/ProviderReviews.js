@@ -17,8 +17,12 @@ const ProviderReviews = () => {
     const loadReviews = async () => {
         try {
             setLoading(true);
+            setErr("");
             const res = await authApis().get(endpoints["provider-reviews"]);
             setReviews(res.data);
+        } catch (ex) {
+            if (ex.response?.status !== 401)
+                setErr("Không tải được đánh giá. Vui lòng thử lại.");
         } finally {
             setLoading(false);
         }
@@ -40,7 +44,7 @@ const ProviderReviews = () => {
             await authApis().put(endpoints["provider-reply-review"](reviewId), { replyText: text });
             setMessage("Đã gửi phản hồi.");
             setReplyText({ ...replyText, [reviewId]: "" });
-            loadReviews();
+            await loadReviews();
         } catch (ex) {
             setErr(ex.response?.data || "Không gửi được phản hồi.");
         }

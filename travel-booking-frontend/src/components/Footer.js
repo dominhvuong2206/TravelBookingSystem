@@ -20,7 +20,10 @@ const Footer = () => {
             <Container>
                 <Row className="g-4 py-5">
                     <Col md={4} lg={3}>
-                        <div style={styles.brand}>Travel Booking</div>
+                        <div style={styles.brand}>
+                            <img src={process.env.PUBLIC_URL + "/travel-booking-logo.png"} alt="" aria-hidden="true" style={styles.brandLogo} />
+                            <span>Travel Booking</span>
+                        </div>
                         <p style={styles.tagline}>
                             Nền tảng tìm kiếm, đặt dịch vụ và quản lý giao dịch du lịch trực tuyến cho khách hàng, nhà cung cấp và quản trị viên.
                         </p>

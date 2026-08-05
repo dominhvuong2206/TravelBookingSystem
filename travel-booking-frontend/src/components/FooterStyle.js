@@ -5,10 +5,18 @@ const footerStyles = {
         color: "#d1d5db",
     },
     brand: {
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
         color: "#ffffff",
         fontSize: "1.35rem",
         fontWeight: 800,
         marginBottom: 10,
+    },
+    brandLogo: {
+        width: 42,
+        height: 42,
+        objectFit: "contain",
     },
     tagline: {
         color: "#cbd5e1",

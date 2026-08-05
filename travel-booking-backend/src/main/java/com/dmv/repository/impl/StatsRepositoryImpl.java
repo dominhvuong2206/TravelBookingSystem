@@ -285,7 +285,6 @@ public class StatsRepositoryImpl implements StatsRepository {
         return result;
     }
 
-    // Helper: build booking predicates for sumRevenue fallback (non-PAID case)
     private List<Predicate> buildBookingPredicates(CriteriaBuilder b, Root<Booking> root, Map<String, String> params) {
         List<Predicate> predicates = new ArrayList<>();
         if (params == null) return predicates;

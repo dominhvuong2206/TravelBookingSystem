@@ -1,296 +1,389 @@
 # Travel Booking System
 
-Hệ thống đặt vé du lịch trực tuyến — project môn học.
+[![CI](https://github.com/dominhvuong2206/TravelBookingSystem/actions/workflows/ci.yml/badge.svg)](https://github.com/dominhvuong2206/TravelBookingSystem/actions/workflows/ci.yml)
+![Java](https://img.shields.io/badge/Java-17-ED8B00?logo=openjdk&logoColor=white)
+![Spring](https://img.shields.io/badge/Spring_MVC-6.2-6DB33F?logo=spring&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+![MySQL](https://img.shields.io/badge/MySQL-8-4479A1?logo=mysql&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Tomcat_10-2496ED?logo=docker&logoColor=white)
 
-## 🌐 Demo
+A full-stack travel marketplace that connects travelers with service providers. Customers can discover, compare, book, review, and pay for travel services; providers manage their listings and operations; administrators oversee users, categories, transactions, and business performance.
 
-| | URL |
-|---|---|
-| **Frontend (AWS S3)** | http://travel-booking-dmv.s3-website-ap-southeast-1.amazonaws.com/ |
-| **Backend API (Railway)** | https://travelbookingsystem-production-e035.up.railway.app/TravelBookingSystem/api/ |
+## Live Demo
 
-## Kiến trúc Hệ thống (System Architecture)
-
-Dự án được xây dựng theo mô hình **Client-Server** với Frontend và Backend tách biệt hoàn toàn (Decoupled Architecture), giao tiếp qua **RESTful API**.
-
-### 1. Backend Architecture (Spring MVC)
-Backend áp dụng kiến trúc **N-Tier (Layered Architecture)** truyền thống của Spring, chia làm các tầng rõ rệt để đảm bảo Separation of Concerns (SoC).
-
-```text
-travel-booking-backend/src/main/java/com/dmv/
-├── configs/       # Cấu hình hệ thống (Spring, Hibernate, Security, JWT, Cloudinary)
-├── controllers/   # Tầng Controller: Tiếp nhận HTTP Request, xử lý Routing & gọi Service
-│   ├── admin/     # API dành riêng cho Admin
-│   ├── provider/  # API dành riêng cho Provider 
-│   ├── payment/   # Tích hợp cổng thanh toán (Stripe, PayPal, ZaloPay, MoMo)
-│   └── ...        # Các API chung (Public, Auth)
-├── service/       # Tầng Business Logic: Xử lý nghiệp vụ lõi của ứng dụng
-├── repository/    # Tầng Data Access (DAO): Tương tác trực tiếp với Database qua Hibernate
-├── pojo/          # Tầng Domain/Entity: Các lớp Java ánh xạ 1-1 với bảng trong cơ sở dữ liệu (ORM)
-├── filters/       # Tầng Security Filter: Chặn request, kiểm tra và xác thực JWT token
-└── utils/         # Các hàm tiện ích (Utils), constants dùng chung
-```
-
-**Luồng xử lý (Data Flow):**
-`Client Request` ➡️ `JWT Filter` (Xác thực) ➡️ `Controller` ➡️ `Service` (Logic) ➡️ `Repository` (DB query) ➡️ `MySQL`
-
-### 2. Frontend Architecture (React)
-Frontend được cấu trúc theo Component-Based Architecture, quản lý trạng thái (State) tập trung và phân định rõ UI Component với Logic.
-
-```text
-travel-booking-frontend/src/
-├── components/    # Dumb/Shared Components: Các UI components dùng chung (Navbar, Footer, Button...)
-├── screens/       # Smart Components (Pages/Views): Các trang chính đại diện cho các Route
-│   ├── Admin/     # Giao diện Dashboard quản lý cho Admin
-│   ├── Provider/  # Giao diện quản lý dịch vụ/booking cho Provider
-│   ├── Customer/  # Giao diện người dùng cuối (Home, Booking, Payment...)
-│   └── Auth/      # Giao diện Đăng nhập / Đăng ký
-├── services/      # API Services: Các module đóng gói Axios để gọi API (Auth API, Booking API...)
-├── reducers/      # State Management: Chứa các reducers (useReducer/Context API) quản lý global state
-├── configs/       # Cấu hình App, cấu hình Axios instance, interceptors, constants
-└── utils/         # Các helper functions (Format tiền tệ, xử lý ngày tháng...)
-```
-
-**Quản lý State & Route:**
-- Sử dụng `React Router` để điều hướng trang (SPA - Single Page Application).
-- Quản lý Global State (như thông tin User đang đăng nhập) thông qua `Context API` kết hợp `useReducer`.
-- Gọi API độc lập thông qua `Axios` được thiết lập interceptors để tự động đính kèm JWT token vào header.
-
-## Tech Stack
-
-| Thành phần | Công nghệ |
-|---|---|
-| Backend | Java 17, Spring MVC 6, Hibernate 6, Spring Security 6 |
-| Frontend | React 19, React Router 6, Bootstrap 5, Chart.js, Axios |
-| Database | MySQL 8 (utf8mb4) |
-| Auth | JWT (nimbus-jose-jwt) + BCrypt |
-| Upload ảnh | Cloudinary |
-| Thanh toán | Stripe, PayPal, MoMo, ZaloPay |
-| Deploy Backend | Railway (Docker + Tomcat 10) |
-| Deploy Frontend | AWS S3 (Static Website Hosting) |
-
----
-
-## Chức năng
-
-### 👤 Customer
-- Xem danh sách & tìm kiếm dịch vụ du lịch
-- Xem chi tiết dịch vụ, đánh giá
-- Đăng ký / Đăng nhập
-- Đặt dịch vụ & thanh toán (Stripe, PayPal, MoMo, ZaloPay)
-- Xem lịch sử booking
-- So sánh dịch vụ
-- Cập nhật hồ sơ cá nhân
-
-### 🏢 Provider
-- Quản lý dịch vụ (thêm / sửa / xóa)
-- Xem booking của dịch vụ mình
-- Xem thống kê doanh thu
-- Quản lý đánh giá & phản hồi
-- Xem lịch sử thanh toán
-
-### 🔑 Admin
-- Dashboard thống kê tổng quan
-- Quản lý người dùng (kích hoạt / duyệt provider)
-- Quản lý danh mục dịch vụ
-- Xem lịch sử thanh toán toàn hệ thống
-
----
-
-## Tài khoản demo
-
-| Username | Password | Quyền |
+| Application | URL | Status |
 |---|---|---|
-| `admin` | `Admin@123` | Admin |
-| `provider` | `Provider@123` | Provider |
-| `customer` | `Customer@123` | Customer |
+| React frontend | [AWS S3 website](http://travel-booking-dmv.s3-website-ap-southeast-1.amazonaws.com/) | Online |
+| REST API | Koyeb URL will be added after migration | Deployment in progress |
 
----
+> The frontend is online, but API-dependent features will remain unavailable until the backend migration from Railway to Koyeb is complete.
 
-## Cài đặt & Chạy local
+## Project Highlights
 
-### Yêu cầu
-- Java 17+
+- Role-based workflows for customers, service providers, and administrators.
+- JWT authentication, BCrypt password hashing, protected REST endpoints, and role-based authorization.
+- Full booking lifecycle with availability tracking, confirmation, cancellation, and payment status management.
+- Search, filtering, pagination, reviews, rating summaries, and side-by-side service comparison.
+- Provider and administrator dashboards with revenue and booking analytics.
+- Real-time customer-provider chat powered by Firebase.
+- Cloudinary image uploads and sandbox integrations for Stripe, PayPal, MoMo, and ZaloPay.
+- Decoupled React and Spring MVC architecture backed by Hibernate ORM and MySQL.
+- Multi-stage Docker build and automated frontend/backend verification with GitHub Actions.
+
+## Features by Role
+
+### Customer
+
+- Register, sign in, and manage a personal profile.
+- Browse, search, filter, and compare travel services.
+- View service details, availability, ratings, and reviews.
+- Create bookings, view booking history, and cancel eligible bookings.
+- Review completed services and view payment history.
+- Use configured sandbox payment gateways.
+- Chat with a provider about a service or booking.
+
+### Service Provider
+
+- Create, update, activate, deactivate, and delete travel services.
+- Upload service images through Cloudinary.
+- Review bookings for each owned service.
+- Confirm or cancel bookings and update payment status.
+- View customer feedback and post provider replies.
+- Monitor revenue, booking performance, and payment history.
+
+### Administrator
+
+- View platform-level summary, revenue, and booking analytics.
+- Browse users, control account activation, and approve providers.
+- Create, update, activate, and deactivate service categories.
+- Review platform-wide payment transactions and update payment status.
+
+## Architecture
+
+The project uses a decoupled client-server architecture. The React single-page application communicates with the backend through REST APIs, while the backend follows a layered Spring MVC design.
+
+```mermaid
+flowchart LR
+    U[User Browser] --> F[React SPA<br/>AWS S3]
+    F -->|REST / JSON + JWT| B[Spring MVC API<br/>Tomcat / Koyeb]
+    B -->|Hibernate ORM| D[(MySQL<br/>Aiven)]
+    B --> C[Cloudinary]
+    B --> P[Payment Sandboxes]
+    F --> R[Firebase Chat]
+```
+
+Backend request flow:
+
+```text
+HTTP Request
+    -> Security / JWT Filter
+    -> Controller
+    -> Service
+    -> Repository
+    -> Hibernate
+    -> MySQL
+```
+
+## Technology Stack
+
+| Area | Technologies |
+|---|---|
+| Frontend | React 19, React Router 6, React Bootstrap, Axios, Chart.js |
+| Backend | Java 17, Spring MVC 6, Spring Security 6, Hibernate ORM 6 |
+| Database | MySQL 8, utf8mb4 |
+| Authentication | JWT with Nimbus JOSE + JWT, BCrypt |
+| Media and chat | Cloudinary, Firebase |
+| Payments | Stripe, PayPal, MoMo, ZaloPay sandbox APIs |
+| Testing | JUnit 5, Jest, React Testing Library |
+| Build and runtime | Maven, npm, Docker, Tomcat 10 |
+| CI/CD and hosting | GitHub Actions, AWS S3, Koyeb, Aiven MySQL |
+
+## Repository Structure
+
+```text
+TravelBookingSystem/
+|-- .github/workflows/ci.yml       # Automated frontend and backend checks
+|-- travel-booking-backend/        # Spring MVC REST API packaged as a WAR
+|   |-- src/main/java/com/dmv/
+|   |   |-- configs/               # Spring, Hibernate, security, and integrations
+|   |   |-- controllers/           # Public, customer, provider, admin, payment APIs
+|   |   |-- filters/               # JWT authentication filter
+|   |   |-- pojo/                  # Hibernate entities
+|   |   |-- repository/            # Persistence layer
+|   |   |-- service/               # Business logic
+|   |   `-- utils/                 # Shared utilities
+|   |-- src/test/                  # Backend unit tests
+|   |-- .env.example               # Backend environment variable template
+|   |-- Dockerfile                 # Maven build and Tomcat runtime image
+|   `-- pom.xml
+|-- travel-booking-frontend/       # React single-page application
+|   |-- public/
+|   |-- src/
+|   |   |-- components/            # Shared UI, routing, charts, and chat
+|   |   |-- configs/               # API, Firebase, and context configuration
+|   |   |-- reducers/              # Context and reducer state management
+|   |   |-- screens/               # Customer, provider, and admin pages
+|   |   |-- services/              # Firebase chat service
+|   |   `-- utils/                 # Authentication and date helpers
+|   |-- .env.example               # Frontend environment variable template
+|   `-- package.json
+|-- travelbookingdb.sql            # Database schema and base data
+`-- seed-travel-sample-data.sql    # Portfolio demonstration data
+```
+
+## Getting Started
+
+### Prerequisites
+
+- Java Development Kit 17+
 - Maven 3.9+
+- Node.js 20+ and npm
 - MySQL 8+
-- Node.js 18+
-- Tomcat 10 (hoặc chạy qua Maven)
+- Tomcat 10.1+ or Docker
+- MySQL Workbench or the MySQL CLI
 
-### 1. Tạo database local
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/dominhvuong2206/TravelBookingSystem.git
+cd TravelBookingSystem
+```
+
+### 2. Initialize the database
+
+Import the schema first, followed by the demonstration data:
 
 ```bash
 mysql -u root -p < travelbookingdb.sql
 mysql -u root -p travelbookingdb < seed-travel-sample-data.sql
 ```
 
-### 2. Cấu hình backend
+On Windows PowerShell, use MySQL Workbench or run the commands through `cmd.exe`:
 
-Chỉnh `travel-booking-backend/src/main/resources/databases.properties`:
-
-```properties
-hibernate.connection.url=jdbc:mysql://localhost:3306/travelbookingdb?useUnicode=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
-hibernate.connection.username=root
-hibernate.connection.password=your_password
+```powershell
+cmd /c "mysql -u root -p < travelbookingdb.sql"
+cmd /c "mysql -u root -p travelbookingdb < seed-travel-sample-data.sql"
 ```
 
-### 3. Chạy backend
+### 3. Configure the backend
+
+Use [`travel-booking-backend/.env.example`](travel-booking-backend/.env.example) as the variable reference. The application reads the process environment; it does not automatically load a `.env` file when launched directly with Maven or Tomcat.
+
+Minimum local PowerShell configuration:
+
+```powershell
+$env:MYSQLHOST="localhost"
+$env:MYSQLPORT="3306"
+$env:MYSQLDATABASE="travelbookingdb"
+$env:MYSQLUSER="root"
+$env:MYSQLPASSWORD="your-mysql-password"
+$env:JWT_SECRET="replace-with-a-random-secret-of-at-least-32-bytes"
+$env:JWT_EXPIRATION_MS="86400000"
+$env:FRONTEND_URL="http://localhost:3000"
+$env:BACKEND_URL="http://localhost:8080/TravelBookingSystem"
+$env:CORS_ALLOWED_ORIGINS="http://localhost:3000"
+```
+
+Cloudinary and payment variables are optional unless their related features are being tested.
+
+### 4. Build and run the backend
+
+#### Option A: Tomcat
 
 ```bash
 cd travel-booking-backend
-mvn clean package -DskipTests
-# Deploy file target/travel-booking-backend-1.0-SNAPSHOT.war lên Tomcat local
-# hoặc dùng Tomcat plugin
+mvn clean verify
 ```
 
-Backend chạy tại: `http://localhost:8080/TravelBookingSystem/`
+Deploy `target/travel-booking-backend-1.0-SNAPSHOT.war` to Tomcat 10.1. Rename it to `TravelBookingSystem.war` when copying it into Tomcat's `webapps` directory.
 
-### 4. Chạy frontend
+```text
+http://localhost:8080/TravelBookingSystem
+```
+
+#### Option B: Docker
+
+Create `travel-booking-backend/.env` from the example. When MySQL runs on the host machine, set:
+
+```dotenv
+HIBERNATE_CONNECTION_URL=jdbc:mysql://host.docker.internal:3306/travelbookingdb?useUnicode=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+```
+
+Then build and start the container:
 
 ```bash
+cd travel-booking-backend
+docker build -t travel-booking-backend .
+docker run --rm --env-file .env -p 8080:8080 travel-booking-backend
+```
+
+### 5. Configure and run the frontend
+
+```powershell
 cd travel-booking-frontend
-npm install
+Copy-Item .env.example .env
+npm ci
 npm start
 ```
 
-Frontend chạy tại: `http://localhost:3000`
+The frontend runs at `http://localhost:3000`. Its default API configuration is:
 
----
-
-## 🚀 Deploy lên Production
-
-### 🔧 Backend → Railway (mỗi lần sửa code Java)
-
-Railway tự động rebuild khi nhận commit mới trên nhánh `main`.
-
-```bash
-# 1. Stage các file đã thay đổi
-git add .
-
-# 2. Commit với message mô tả thay đổi
-git commit -m "feat: mô tả thay đổi"
-
-# 3. Push lên GitHub → Railway tự rebuild
-git push origin main
+```dotenv
+REACT_APP_API_BASE_URL=http://localhost:8080/TravelBookingSystem/api/
 ```
 
-**Theo dõi tiến trình rebuild:**
-> Railway Dashboard → click service **backend** → tab **Deployments**  
-> Chờ trạng thái chuyển sang ✅ **Success** (khoảng 3–5 phút)
+## Environment Variables
 
-**Kiểm tra API sau khi deploy:**
-> https://travelbookingsystem-production-e035.up.railway.app/TravelBookingSystem/api/categories/
+### Backend core variables
 
----
+| Variable | Required | Description |
+|---|---:|---|
+| `HIBERNATE_CONNECTION_URL` | Production | Complete JDBC URL; recommended for hosted databases and TLS configuration |
+| `MYSQLHOST` | Local fallback | MySQL hostname |
+| `MYSQLPORT` | Local fallback | MySQL port |
+| `MYSQLDATABASE` | Local fallback | Database name |
+| `MYSQLUSER` | Yes | Database username |
+| `MYSQLPASSWORD` | Yes | Database password |
+| `JWT_SECRET` | Yes | JWT signing secret with at least 32 UTF-8 bytes |
+| `JWT_EXPIRATION_MS` | No | Token lifetime in milliseconds; defaults to `86400000` |
+| `FRONTEND_URL` | Yes | Public frontend URL used for redirects and CORS fallback |
+| `BACKEND_URL` | Production | Public backend context URL used by payment callbacks |
+| `CORS_ALLOWED_ORIGINS` | Yes | Comma-separated list of allowed frontend origins |
 
-### 🌐 Frontend → AWS S3 (mỗi lần sửa code React)
+### Optional integrations
 
-S3 **không** tự động rebuild — cần build và upload thủ công mỗi lần thay đổi.
-
-**Bước 1 — Build production bundle:**
-
-```bash
-cd travel-booking-frontend
-npm run build
-```
-
-> Output nằm trong thư mục `travel-booking-frontend/build/`
-
-**Bước 2 — Upload lên S3:**
-
-```bash
-# Từ thư mục gốc TravelBookingSystem/
-aws s3 sync travel-booking-frontend/build/ s3://travel-booking-dmv/ --delete
-```
-
-> Cờ `--delete` sẽ xóa các file cũ trên S3 không còn trong build mới.
-
-**Kiểm tra sau khi upload:**
-> http://travel-booking-dmv.s3-website-ap-southeast-1.amazonaws.com/
-
----
-
-### 🔄 Sửa cả Backend lẫn Frontend cùng lúc
-
-Thực hiện theo thứ tự:
-
-```bash
-# Bước 1: Push backend lên Railway trước
-git add .
-git commit -m "feat: mô tả thay đổi"
-git push origin main
-
-# Bước 2: Build và upload frontend lên S3
-cd travel-booking-frontend
-npm run build
-cd ..
-aws s3 sync travel-booking-frontend/build/ s3://travel-booking-dmv/ --delete
-```
-
-> **Lưu ý:** Nên đợi Railway rebuild xong rồi mới upload frontend,  
-> tránh trường hợp frontend gọi API mới trong khi backend chưa cập nhật.
-
----
-
-### 🗄️ Cập nhật Database Railway
-
-Khi cần import lại hoặc cập nhật dữ liệu:
-
-```bash
-# Schema (DROP + CREATE lại bảng)
-mysql -h acela.proxy.rlwy.net -u root -pMATKHAU --port 36684 --protocol=TCP railway < travelbookingdb.sql
-
-# Dữ liệu mẫu
-mysql -h acela.proxy.rlwy.net -u root -pMATKHAU --port 36684 --protocol=TCP railway < seed-travel-sample-data.sql
-```
-
----
-
-## Biến môi trường Railway (Backend)
-
-| Biến | Mô tả |
+| Integration | Variables |
 |---|---|
-| `MYSQLHOST` | Host MySQL nội bộ Railway (tự động) |
-| `MYSQLPORT` | Port MySQL (tự động) |
-| `MYSQLDATABASE` | Tên database (tự động) |
-| `MYSQLUSER` | User MySQL (tự động) |
-| `MYSQLPASSWORD` | Mật khẩu MySQL (tự động) |
-| `FRONTEND_URL` | URL frontend S3 (cho CORS) |
-| `CORS_ALLOWED_ORIGINS` | Danh sách origin được phép (có thể nhiều, cách nhau dấu phẩy) |
-| `CLOUDINARY_CLOUD_NAME` | Cloudinary config |
-| `CLOUDINARY_API_KEY` | Cloudinary config |
-| `CLOUDINARY_API_SECRET` | Cloudinary config |
-| `STRIPE_SECRET_KEY` | Stripe payment |
-| `PAYPAL_CLIENT_ID` | PayPal payment |
-| `PAYPAL_CLIENT_SECRET` | PayPal payment |
+| Cloudinary | `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` |
+| Stripe | `STRIPE_SECRET_KEY` |
+| PayPal | `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET` |
+| MoMo | `MOMO_PARTNER_CODE`, `MOMO_ACCESS_KEY`, `MOMO_SECRET_KEY` |
+| ZaloPay | `ZALOPAY_APP_ID`, `ZALOPAY_KEY1`, `ZALOPAY_KEY2` |
 
----
+Frontend uses `REACT_APP_API_BASE_URL`, which must include the `/api/` suffix.
 
-## Cấu trúc API
+> Never commit production credentials. Use environment variables or the secret-management feature provided by the hosting platform.
 
+## API Overview
+
+The local API root is `http://localhost:8080/TravelBookingSystem/api`.
+
+### Public and authentication routes
+
+| Method | Route | Description |
+|---|---|---|
+| `POST` | `/api/users` | Register a customer or provider account |
+| `POST` | `/api/login` | Authenticate and receive a JWT |
+| `GET` | `/api/categories` | List active service categories |
+| `GET` | `/api/services` | Search and paginate travel services |
+| `GET` | `/api/services/{serviceId}` | Get service details |
+| `GET` | `/api/services/{serviceId}/reviews` | List service reviews |
+| `GET` | `/api/services/{serviceId}/rating-summary` | Get aggregate rating data |
+
+### Protected route groups
+
+| Route group | Access | Purpose |
+|---|---|---|
+| `/api/secure/profile` | Authenticated | View and update the current profile |
+| `/api/secure/bookings/**` | Customer | Create, list, view, and cancel bookings |
+| `/api/secure/payments/**` | Customer | Payment history and payment operations |
+| `/api/secure/provider/**` | Provider | Service, booking, review, payment, and analytics management |
+| `/api/secure/admin/**` | Administrator | User, category, payment, and analytics administration |
+
+Protected requests use `Authorization: Bearer <jwt-token>`.
+
+## Demo Accounts
+
+| Username | Password | Role |
+|---|---|---|
+| `admin` | `Admin@123` | Administrator |
+| `provider` | `Provider@123` | Service provider |
+| `customer` | `Customer@123` | Customer |
+
+> These credentials are only for local development and a public portfolio demo. Replace or disable them before using the project in a real production environment.
+
+## Testing and Quality Checks
+
+Backend verification:
+
+```bash
+cd travel-booking-backend
+mvn clean verify
 ```
-/api/
-├── auth/login              POST  - Đăng nhập, trả JWT
-├── auth/register           POST  - Đăng ký customer/provider
-├── services/               GET   - Danh sách dịch vụ (public)
-├── services/{id}           GET   - Chi tiết dịch vụ (public)
-├── categories/             GET   - Danh mục dịch vụ (public)
-├── secure/
-│   ├── admin/
-│   │   ├── users/          GET/PUT - Quản lý user (ADMIN)
-│   │   ├── categories/     GET/POST/PUT/DELETE - Quản lý danh mục (ADMIN)
-│   │   ├── payments/       GET   - Lịch sử thanh toán (ADMIN)
-│   │   └── stats/          GET   - Thống kê (ADMIN)
-│   ├── provider/
-│   │   ├── services/       GET/POST/PUT/DELETE - Quản lý dịch vụ (PROVIDER)
-│   │   ├── bookings/       GET/PUT - Quản lý booking (PROVIDER)
-│   │   ├── reviews/        GET/POST - Phản hồi đánh giá (PROVIDER)
-│   │   ├── payments/       GET   - Lịch sử thanh toán (PROVIDER)
-│   │   └── stats/          GET   - Thống kê doanh thu (PROVIDER)
-│   ├── bookings/           GET/POST - Đặt dịch vụ (CUSTOMER)
-│   └── payments/           GET   - Lịch sử thanh toán (CUSTOMER)
-└── payments/
-    ├── stripe/create       POST  - Tạo payment Stripe (CUSTOMER)
-    ├── paypal/create       POST  - Tạo payment PayPal (CUSTOMER)
-    ├── momo/create         POST  - Tạo payment MoMo (CUSTOMER)
-    └── zalopay/create      POST  - Tạo payment ZaloPay (CUSTOMER)
+
+Frontend tests and production build:
+
+```bash
+cd travel-booking-frontend
+npm ci
+npm test -- --watchAll=false
+npm run build
 ```
+
+GitHub Actions runs the same backend verification, frontend tests, and production build for pull requests and pushes to `main`.
+
+## Production Deployment
+
+The planned portfolio deployment is:
+
+```text
+React frontend  -> AWS S3 static website hosting
+Spring MVC API  -> Koyeb Docker web service
+MySQL database  -> Aiven for MySQL
+```
+
+### Backend on Koyeb
+
+```text
+Builder:              Dockerfile
+Work directory:       travel-booking-backend
+Dockerfile location:  Dockerfile
+Exposed port:         8080 / HTTP
+```
+
+For Aiven, provide a TLS-enabled database URL:
+
+```dotenv
+HIBERNATE_CONNECTION_URL=jdbc:mysql://<HOST>:<PORT>/travelbookingdb?sslMode=REQUIRED&useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+```
+
+The deployed API URL includes the WAR context path:
+
+```text
+https://<koyeb-domain>/TravelBookingSystem/api/
+```
+
+### Frontend on AWS S3
+
+Create `travel-booking-frontend/.env.production`:
+
+```dotenv
+REACT_APP_API_BASE_URL=https://<koyeb-domain>/TravelBookingSystem/api/
+```
+
+Build and upload the static application:
+
+```bash
+cd travel-booking-frontend
+npm ci
+npm run build
+aws s3 sync build/ s3://travel-booking-dmv/ --delete
+```
+
+## Security Notes
+
+- JWT signing fails fast when `JWT_SECRET` is missing or shorter than 32 bytes.
+- Passwords are stored using BCrypt rather than plain text.
+- Customer, provider, and administrator endpoints are protected independently.
+- CORS origins are controlled through environment configuration.
+- Secrets belong in the deployment platform's secret store and must never be committed.
+- Payment credentials should use sandbox accounts for portfolio demonstrations.
+
+## Author
+
+**Do Minh Vuong**
+
+- GitHub: [github.com/dominhvuong2206](https://github.com/dominhvuong2206)
+- LinkedIn: [linkedin.com/in/dominhvuong2206](https://www.linkedin.com/in/dominhvuong2206)
+
+This project was developed as a full-stack software engineering portfolio project, with an emphasis on layered architecture, REST API design, authentication, role-based workflows, third-party integrations, testing, and cloud deployment.

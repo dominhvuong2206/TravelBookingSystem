@@ -1,3 +1,5 @@
+import cookies from "react-cookies";
+
 export const getStoredUser = () => {
     const rawUser = localStorage.getItem("user");
 
@@ -13,6 +15,18 @@ export const getStoredUser = () => {
 };
 
 export const AUTH_COOKIE_PATHS = ["/", "/login", "/admin", "/provider", "/provider/services"];
+export const clearAuthSession = () => {
+    cookies.remove("token");
+    cookies.remove("user");
+
+    for (const path of AUTH_COOKIE_PATHS) {
+        cookies.remove("token", { path });
+        cookies.remove("user", { path });
+    }
+
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+};
 
 export const normalizeRole = (user) => {
     const role = user?.userRole || user?.role;

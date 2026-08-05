@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Alert, Badge, Button, ButtonGroup, Card, Col, Form, Row, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import Apis, { authApis, endpoints } from "../../configs/Apis";
@@ -7,6 +7,15 @@ import styles from "./MyServicesStyle";
 
 const PAGE_SIZE = 20;
 
+const buildQuery = (currentPage, currentFilters) => {
+    const params = new URLSearchParams({ page: String(currentPage) });
+    Object.entries(currentFilters).forEach(([key, value]) => {
+        if (value)
+            params.set(key, value);
+    });
+    return params.toString();
+};
+
 const MyServices = () => {
     const [services, setServices] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -14,24 +23,22 @@ const MyServices = () => {
     const [page, setPage] = useState(1);
     const [filters, setFilters] = useState({ kw: "", cateId: "", status: "" });
     const [loading, setLoading] = useState(false);
+    const [appliedFilters, setAppliedFilters] = useState(filters);
     const [message, setMessage] = useState("");
+    const [error, setError] = useState("");
     const nav = useNavigate();
 
-    const buildQuery = (currentPage = page, currentFilters = filters) => {
-        const params = new URLSearchParams({ page: String(currentPage) });
-        Object.entries(currentFilters).forEach(([key, value]) => {
-            if (value)
-                params.set(key, value);
-        });
-        return params.toString();
-    };
 
     const loadCategories = async () => {
-        const res = await Apis.get(endpoints["categories"]);
-        setCategories(res.data);
+        try {
+            const res = await Apis.get(endpoints["categories"]);
+            setCategories(res.data);
+        } catch {
+            setError("Không tải được danh mục. Vui lòng thử lại.");
+        }
     };
 
-    const loadServices = async (currentPage = page, currentFilters = filters) => {
+    const loadServices = useCallback(async (currentPage = page, currentFilters = appliedFilters) => {
         try {
             setLoading(true);
             const query = buildQuery(currentPage, currentFilters);
@@ -41,18 +48,21 @@ const MyServices = () => {
             ]);
             setServices(servicesRes.data);
             setCount(countRes.data);
+        } catch (ex) {
+            if (ex.response?.status !== 401)
+                setError("Không tải được dịch vụ. Vui lòng thử lại.");
         } finally {
             setLoading(false);
         }
-    };
+    }, [appliedFilters, page]);
 
     useEffect(() => {
         loadCategories();
     }, []);
 
     useEffect(() => {
-        loadServices(page, filters);
-    }, [page]); 
+        loadServices();
+    }, [loadServices]);
 
     const updateFilter = (field, value) => {
         setFilters(current => ({ ...current, [field]: value }));
@@ -60,34 +70,45 @@ const MyServices = () => {
 
     const filterServices = (e) => {
         e.preventDefault();
+        setAppliedFilters(filters);
         setPage(1);
-        loadServices(1, filters);
     };
 
     const clearFilters = () => {
         const cleared = { kw: "", cateId: "", status: "" };
         setFilters(cleared);
         setPage(1);
-        loadServices(1, cleared);
+        setAppliedFilters(cleared);
     };
 
 
 
     const deleteService = async (service) => {
-        if (!window.confirm(`Xóa vĩnh viễn dịch vụ "${service.name}"?`))
+        if (!window.confirm('Xóa vĩnh viễn dịch vụ "' + service.name + '"?'))
             return;
 
-        await authApis().delete(endpoints["provider-service-delete"](service.id));
-        setMessage("Đã xóa dịch vụ.");
-        loadServices();
+        try {
+            setError("");
+            await authApis().delete(endpoints["provider-service-delete"](service.id));
+            setMessage("Đã xóa dịch vụ.");
+            await loadServices();
+        } catch (ex) {
+            if (ex.response?.status !== 401)
+                setError("Không xóa được dịch vụ. Vui lòng thử lại.");
+        }
     };
 
     const toggleStatus = async (service) => {
-        await authApis().put(endpoints["provider-service-toggle-status"](service.id));
-        setMessage(service.status === "ACTIVE" ? "Đã tạm dừng dịch vụ." : "Đã kích hoạt dịch vụ.");
-        loadServices();
+        try {
+            setError("");
+            await authApis().put(endpoints["provider-service-toggle-status"](service.id));
+            setMessage(service.status === "ACTIVE" ? "Đã tạm dừng dịch vụ." : "Đã kích hoạt dịch vụ.");
+            await loadServices();
+        } catch (ex) {
+            if (ex.response?.status !== 401)
+                setError("Không cập nhật được trạng thái dịch vụ. Vui lòng thử lại.");
+        }
     };
-
     const totalPages = Math.max(1, Math.ceil(count / PAGE_SIZE));
     const visiblePages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
@@ -100,6 +121,7 @@ const MyServices = () => {
         </div>
 
         {message && <Alert variant="success" dismissible onClose={() => setMessage("")}>{message}</Alert>}
+        {error && <Alert variant="danger" dismissible onClose={() => setError("")}>{error}</Alert>}
 
         <Form onSubmit={filterServices} className="border rounded p-3 mb-3 bg-light">
             <Row className="g-2 align-items-end">

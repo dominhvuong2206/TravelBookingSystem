@@ -23,3 +23,22 @@
 hs_err_pid*
 replay_pid*
 /travel-booking-backend/target/
+
+# Node / React
+/travel-booking-frontend/node_modules/
+/travel-booking-frontend/build/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local environment files (keep templates)
+.env
+.env.*
+!.env.example
+!**/.env.example
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

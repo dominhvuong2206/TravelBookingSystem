@@ -9,12 +9,23 @@ const headerStyles = {
     },
     brand: {
         display: "inline-flex",
-        flexDirection: "column",
+        alignItems: "center",
+        gap: 9,
         lineHeight: 1.1,
         color: "#1d4ed8",
         fontWeight: 800,
         textDecoration: "none",
         marginRight: 20,
+    },
+    brandLogo: {
+        width: 42,
+        height: 42,
+        objectFit: "contain",
+        flexShrink: 0,
+    },
+    brandCopy: {
+        display: "inline-flex",
+        flexDirection: "column",
     },
     brandName: {
         fontSize: "1.28rem",

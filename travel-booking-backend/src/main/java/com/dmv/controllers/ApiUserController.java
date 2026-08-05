@@ -25,6 +25,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class ApiUserController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private JwtUtils jwtUtils;
     @PostMapping(path = "/users", 
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE, 
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -37,7 +39,7 @@ public class ApiUserController {
     public ResponseEntity<?> login(@RequestBody User u) {
         if (this.userService.authenticate(u.getUsername(), u.getPassword())) {
             try {
-                String token = JwtUtils.generateToken(u.getUsername());
+                String token = this.jwtUtils.generateToken(u.getUsername());
                 return ResponseEntity.ok().body(Collections.singletonMap("token", token));
             } catch (Exception e) {
                 return ResponseEntity.status(500).body("Lỗi khi tạo JWT");

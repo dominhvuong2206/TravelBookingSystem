@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useContext } from "react";
 import { Alert, Badge, Button, Spinner, Table } from "react-bootstrap";
 import { Link } from "react-router-dom";
@@ -27,7 +27,7 @@ const MyBookings = () => {
     const [message, setMessage] = useState("");
     const { openBookingChat } = useContext(ChatContext);
 
-    const loadBookings = async () => {
+    const loadBookings = useCallback(async () => {
         try {
             setLoading(true);
             const [bookingsRes, countRes] = await Promise.all([
@@ -39,11 +39,11 @@ const MyBookings = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [page]);
 
     useEffect(() => {
         loadBookings();
-    }, [page]);
+    }, [loadBookings]);
 
     const cancelBooking = async (booking) => {
         if (!window.confirm(`Hủy booking #${booking.id}?`))

@@ -56,34 +56,29 @@ const periodConfig = {
 const MetricCard = ({ label, value, icon, color }) => (
     <Col xl={2} md={4} sm={6}>
         <Card style={styles.card} className="h-100">
-            <Card.Body>
-                <div className="d-flex align-items-center justify-content-between">
-                    <div>
-                        <div style={styles.metricLabel}>{label}</div>
-                        <p style={{ ...styles.metricValue, color }}>{value}</p>
-                    </div>
-                    <FontAwesomeIcon icon={icon} style={{ fontSize: 24, color }} />
+            <Card.Body style={styles.metricBody}>
+                <div style={{ ...styles.iconBox, color, backgroundColor: `${color}14` }}>
+                    <FontAwesomeIcon icon={icon} />
                 </div>
+                <div style={styles.metricLabel}>{label}</div>
+                <p style={{ ...styles.metricValue, color }}>{value}</p>
             </Card.Body>
         </Card>
     </Col>
 );
-
 const toRows = (data, config, fallbackYear) => {
     const values = data?.values || data?.byMonth || {};
 
     if (config.count) {
-        return Array.from({ length: config.count }, (_, i) => {
-            const key = i + 1;
+        return Array.from({ length: config.count }, (_, index) => {
+            const key = index + 1;
             return { key, label: config.keyLabel(key), value: Number(values[key] || 0) };
         });
     }
 
-    const rows = Object.entries(values).map(([key, value]) => ({
-        key,
-        label: config.keyLabel(key),
-        value: Number(value || 0),
-    }));
+    const rows = Object.entries(values)
+        .map(([key, value]) => ({ key, label: config.keyLabel(key), value: Number(value || 0) }))
+        .sort((first, second) => Number(first.key) - Number(second.key));
 
     return rows.length > 0 ? rows : [{ key: fallbackYear, label: `Năm ${fallbackYear}`, value: 0 }];
 };
@@ -97,112 +92,127 @@ const AdminDashboard = () => {
     const [year, setYear] = useState(new Date().getFullYear());
     const [loading, setLoading] = useState(false);
     const [reportLoading, setReportLoading] = useState(false);
-    const [err, setErr] = useState("");
-    const nav = useNavigate();
+    const [overviewError, setOverviewError] = useState("");
+    const [reportError, setReportError] = useState("");
+    const [refreshVersion, setRefreshVersion] = useState(0);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const loadOverview = async () => {
             try {
                 setLoading(true);
-                setErr("");
-                const [summaryRes, servicesRes] = await Promise.all([
+                setOverviewError("");
+                const [summaryResponse, servicesResponse] = await Promise.all([
                     authApis().get(endpoints["admin-stats-summary"]),
                     authApis().get(endpoints["admin-stats-services"]),
                 ]);
-                setSummary(summaryRes.data);
-                setServiceStats(servicesRes.data || []);
-            } catch (ex) {
-                console.error(ex);
-                setErr("Không tải được báo cáo tổng quan hệ thống.");
+                setSummary(summaryResponse.data);
+                setServiceStats(servicesResponse.data || []);
+            } catch (error) {
+                console.error(error);
+                setOverviewError("Không thể tải báo cáo tổng quan. Vui lòng thử lại.");
             } finally {
                 setLoading(false);
             }
         };
 
         loadOverview();
-    }, []);
+    }, [refreshVersion]);
 
     useEffect(() => {
         const loadReports = async () => {
             try {
                 setReportLoading(true);
-                setErr("");
+                setReportError("");
                 const config = periodConfig[period];
                 const query = config.needsYear ? `?year=${year}` : "";
-                const [revenueRes, frequencyRes] = await Promise.all([
+                const [revenueResponse, frequencyResponse] = await Promise.all([
                     authApis().get(`${endpoints[config.revenueEndpoint]}${query}`),
                     authApis().get(`${endpoints[config.frequencyEndpoint]}${query}`),
                 ]);
-                setRevenue(revenueRes.data);
-                setFrequency(frequencyRes.data);
-            } catch (ex) {
-                console.error(ex);
-                setErr("Không tải được dữ liệu báo cáo.");
+                setRevenue(revenueResponse.data);
+                setFrequency(frequencyResponse.data);
+            } catch (error) {
+                console.error(error);
+                setReportError("Không thể tải dữ liệu báo cáo cho kỳ đã chọn.");
             } finally {
                 setReportLoading(false);
             }
         };
 
         loadReports();
-    }, [period, year]);
+    }, [period, refreshVersion, year]);
 
     const config = periodConfig[period];
-    const revenueRows = useMemo(() => toRows(revenue, config, year), [revenue, config, year]);
-    const frequencyRows = useMemo(() => toRows(frequency, config, year), [frequency, config, year]);
-
+    const revenueRows = useMemo(() => toRows(revenue, config, year), [config, revenue, year]);
+    const frequencyRows = useMemo(() => toRows(frequency, config, year), [config, frequency, year]);
     const transactionStatusCounts = summary?.transactionStatusCounts || {};
     const revenueByPaymentMethod = summary?.revenueByPaymentMethod || {};
-    const statusLabels = Object.keys(statusText).map(key => statusText[key]);
-    const statusValues = Object.keys(statusText).map(key => Number(transactionStatusCounts[key] || 0));
-    const methodLabels = Object.keys(methodText).map(key => methodText[key]);
-    const methodValues = Object.keys(methodText).map(key => Number(revenueByPaymentMethod[key] || 0));
+    const statusLabels = Object.keys(statusText).map((key) => statusText[key]);
+    const statusValues = Object.keys(statusText).map((key) => Number(transactionStatusCounts[key] || 0));
+    const methodLabels = Object.keys(methodText).map((key) => methodText[key]);
+    const methodValues = Object.keys(methodText).map((key) => Number(revenueByPaymentMethod[key] || 0));
 
     const sortedServiceStats = useMemo(() => (
-        [...serviceStats].sort((a, b) => Number(b.paidRevenue || 0) - Number(a.paidRevenue || 0))
+        [...serviceStats].sort((first, second) => Number(second.paidRevenue || 0) - Number(first.paidRevenue || 0))
     ), [serviceStats]);
 
-    const topServiceRevenue = Math.max(...serviceStats.map(item => Number(item.paidRevenue || 0)), 1);
+    const topServiceRevenue = Math.max(...serviceStats.map((item) => Number(item.paidRevenue || 0)), 1);
+    const number = (value) => Number(value || 0).toLocaleString("vi-VN");
 
-    if (loading)
-        return <div className="text-center mt-5"><Spinner animation="border" /></div>;
+    if (loading && !summary)
+        return <div className="text-center py-5"><Spinner animation="border" role="status" /><div className="mt-2 text-muted">Đang tải bảng điều khiển...</div></div>;
 
     return <div style={styles.page}>
         <div style={styles.header}>
             <div>
-                <h3 style={styles.title}>Báo cáo tổng quan hệ thống</h3>
-                <p style={styles.subtitle}>Theo dõi dịch vụ đang hoạt động, tần suất booking, doanh thu chung và các chỉ số phục vụ quản lý.</p>
+                <p style={styles.eyebrow}>ADMIN CONSOLE</p>
+                <h1 style={styles.title}>Tổng quan hệ thống</h1>
+                <p style={styles.subtitle}>Theo dõi người dùng, dịch vụ, booking, giao dịch và doanh thu trên toàn nền tảng.</p>
             </div>
             <div className="d-flex gap-2 flex-wrap">
-                <Button variant="outline-primary" onClick={() => nav("/admin/users")}>Quản lý người dùng</Button>
-                <Button variant="outline-warning" onClick={() => nav("/admin/users")}>Duyệt provider</Button>
-                <Button variant="outline-success" onClick={() => nav("/admin/payments")}>Giao dịch</Button>
+                <Button variant="outline-secondary" disabled={loading || reportLoading} onClick={() => setRefreshVersion((value) => value + 1)}>
+                    <FontAwesomeIcon icon="fa-solid fa-rotate" className="me-2" />
+                    Làm mới
+                </Button>
+                <Button variant="primary" onClick={() => navigate("/admin/users?tab=pending")}>
+                    <FontAwesomeIcon icon="fa-solid fa-user-check" className="me-2" />
+                    Duyệt provider
+                </Button>
             </div>
         </div>
 
-        {err && <Alert variant="danger">{err}</Alert>}
+        {overviewError && <Alert variant="danger" className="d-flex justify-content-between align-items-center">
+            <span>{overviewError}</span>
+            <Button size="sm" variant="outline-danger" onClick={() => setRefreshVersion((value) => value + 1)}>Thử lại</Button>
+        </Alert>}
 
         <Row className="g-3">
-            <MetricCard label="Dịch vụ hoạt động" value={Number(summary?.activeServices || 0).toLocaleString("vi-VN")} icon="fa-solid fa-ticket" color="#2563eb" />
-            <MetricCard label="Tổng dịch vụ" value={Number(summary?.totalServices || 0).toLocaleString("vi-VN")} icon="fa-solid fa-layer-group" color="#0ea5e9" />
-            <MetricCard label="Tổng booking" value={Number(summary?.totalBookings || 0).toLocaleString("vi-VN")} icon="fa-solid fa-calendar-check" color="#16a34a" />
-            <MetricCard label="Doanh thu chung" value={formatCurrency(summary?.paidRevenue)} icon="fa-solid fa-wallet" color="#dc2626" />
-            <MetricCard label="Provider chờ duyệt" value={Number(summary?.pendingProviders || 0).toLocaleString("vi-VN")} icon="fa-solid fa-user-clock" color="#d97706" />
+            <MetricCard label="Tổng người dùng" value={number(summary?.totalUsers)} icon="fa-solid fa-users" color="#7c3aed" />
+            <MetricCard label="Provider chờ duyệt" value={number(summary?.pendingProviders)} icon="fa-solid fa-user-clock" color="#d97706" />
+            <MetricCard label="Dịch vụ hoạt động" value={number(summary?.activeServices)} icon="fa-solid fa-ticket" color="#2563eb" />
+            <MetricCard label="Tổng dịch vụ" value={number(summary?.totalServices)} icon="fa-solid fa-layer-group" color="#0ea5e9" />
+            <MetricCard label="Tổng booking" value={number(summary?.totalBookings)} icon="fa-solid fa-calendar-check" color="#16a34a" />
+            <MetricCard label="Doanh thu đã trả" value={formatCurrency(summary?.paidRevenue)} icon="fa-solid fa-wallet" color="#dc2626" />
         </Row>
 
         <Card style={styles.card} className="mt-4">
             <Card.Body>
                 <div style={styles.toolbar}>
-                    <Card.Title className="mb-0" style={styles.tableTitle}>Tùy biến báo cáo theo kỳ</Card.Title>
+                    <div>
+                        <Card.Title className="mb-1" style={styles.tableTitle}>Hiệu suất theo thời gian</Card.Title>
+                        <p className="text-muted mb-0">So sánh tần suất booking và doanh thu đã thanh toán.</p>
+                    </div>
                     <div className="d-flex gap-2 flex-wrap">
-                        <ButtonGroup>
+                        <ButtonGroup aria-label="Chọn kỳ báo cáo">
                             {Object.entries(periodConfig).map(([key, item]) => (
                                 <Button key={key} variant={period === key ? "primary" : "outline-primary"} onClick={() => setPeriod(key)}>
                                     {item.label}
                                 </Button>
                             ))}
                         </ButtonGroup>
-                        {config.needsYear && <Form.Select style={{ width: 120 }} value={year} onChange={e => setYear(Number(e.target.value))}>
-                            {[0, 1, 2, 3, 4].map(offset => {
+                        {config.needsYear && <Form.Select aria-label="Chọn năm" style={{ width: 120 }} value={year} onChange={(event) => setYear(Number(event.target.value))}>
+                            {[0, 1, 2, 3, 4].map((offset) => {
                                 const item = new Date().getFullYear() - offset;
                                 return <option key={item} value={item}>{item}</option>;
                             })}
@@ -210,13 +220,14 @@ const AdminDashboard = () => {
                     </div>
                 </div>
 
-                {reportLoading ? <div className="text-center py-4"><Spinner size="sm" /></div> : <Row className="g-3">
+                {reportError && <Alert variant="warning">{reportError}</Alert>}
+                {reportLoading ? <div className="text-center py-5"><Spinner size="sm" /><span className="ms-2 text-muted">Đang tải báo cáo...</span></div> : <Row className="g-4">
                     <Col lg={6}>
-                        <h5 className="mb-3">Tần suất đặt vé</h5>
+                        <h5 className="mb-3">Tần suất booking</h5>
                         <CountBarChart rows={frequencyRows} title="Số booking" />
                     </Col>
                     <Col lg={6}>
-                        <h5 className="mb-3">Doanh thu chung</h5>
+                        <h5 className="mb-3">Doanh thu</h5>
                         <RevenueBarChart rows={revenueRows} title="Doanh thu đã thanh toán" />
                     </Col>
                 </Row>}
@@ -244,28 +255,34 @@ const AdminDashboard = () => {
 
         <Card style={styles.card} className="mt-4">
             <Card.Body>
-                <Card.Title style={styles.tableTitle}>Doanh thu theo từng dịch vụ</Card.Title>
-                {serviceStats.length === 0 ? <p className="text-muted mb-0">Chưa có booking nào.</p> : <>
-                    <ServiceRevenueChart services={serviceStats} />
+                <div style={styles.toolbar}>
+                    <div>
+                        <Card.Title className="mb-1" style={styles.tableTitle}>Hiệu suất dịch vụ</Card.Title>
+                        <p className="text-muted mb-0">Xếp hạng dịch vụ theo doanh thu đã thanh toán.</p>
+                    </div>
+                    <Button variant="outline-primary" onClick={() => navigate("/admin/categories")}>Quản lý danh mục</Button>
+                </div>
 
-                    <Table bordered hover responsive className="mt-4">
+                {serviceStats.length === 0 ? <Alert variant="light" className="border mb-0">Chưa có dữ liệu booking theo dịch vụ.</Alert> : <>
+                    <ServiceRevenueChart services={serviceStats} />
+                    <Table bordered hover responsive className="mt-4 mb-0 align-middle">
                         <thead className="table-light">
                             <tr>
                                 <th>Dịch vụ</th>
-                                <th className="text-end">Số booking</th>
-                                <th className="text-end">Doanh thu đã thanh toán</th>
+                                <th className="text-end">Booking</th>
+                                <th className="text-end">Doanh thu đã trả</th>
                                 <th style={{ width: "28%" }}>Tỷ trọng doanh thu</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {sortedServiceStats.map(item => {
+                            {sortedServiceStats.map((item) => {
                                 const paidRevenue = Number(item.paidRevenue || 0);
                                 return <tr key={item.serviceId}>
-                                    <td>{item.serviceName}</td>
-                                    <td className="text-end">{Number(item.bookingCount || 0).toLocaleString("vi-VN")}</td>
+                                    <td className="fw-semibold">{item.serviceName}</td>
+                                    <td className="text-end">{number(item.bookingCount)}</td>
                                     <td className="text-end fw-semibold">{formatCurrency(paidRevenue)}</td>
                                     <td>
-                                        <div style={styles.progressTrack}>
+                                        <div style={styles.progressTrack} aria-label={`${Math.round((paidRevenue / topServiceRevenue) * 100)}%`}>
                                             <div style={{ ...styles.progressFill, width: `${Math.round((paidRevenue / topServiceRevenue) * 100)}%` }} />
                                         </div>
                                     </td>

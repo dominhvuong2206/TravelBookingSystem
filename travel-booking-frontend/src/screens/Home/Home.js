@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { Alert, Button, ButtonGroup, Card, Col, Form, Row } from "react-bootstrap";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -34,7 +34,7 @@ const Home = () => {
     const nav = useNavigate();
     const role = normalizeRole(user);
 
-    const buildQuery = (targetPage = page, includePage = true) => {
+    const buildQuery = useCallback((targetPage = page, includePage = true) => {
         const params = new URLSearchParams();
         if (includePage)
             params.set("page", String(targetPage));
@@ -45,14 +45,14 @@ const Home = () => {
         });
 
         return params.toString();
-    };
+    }, [page, q]);
 
     const loadCategories = async () => {
         const res = await Apis.get(endpoints["categories"]);
         setCategories(res.data);
     };
 
-    const loadProducts = async () => {
+    const loadProducts = useCallback(async () => {
         try {
             setLoading(true);
             const [productsRes, countRes] = await Promise.all([
@@ -65,7 +65,7 @@ const Home = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [buildQuery, page]);
 
     useEffect(() => {
         loadCategories();
@@ -73,7 +73,7 @@ const Home = () => {
 
     useEffect(() => {
         loadProducts();
-    }, [q, page]); 
+    }, [loadProducts]);
 
     useEffect(() => {
         setFilters(initialFilters(q));

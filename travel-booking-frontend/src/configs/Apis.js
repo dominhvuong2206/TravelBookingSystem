@@ -1,7 +1,9 @@
 import axios from "axios";
 import cookies from 'react-cookies'
+import { clearAuthSession, getLoginRedirect } from "../utils/authUtils";
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080/TravelBookingSystem/api/";
+let redirectingAfterUnauthorized = false;
 
 export const endpoints = {
     'categories': '/categories',
@@ -72,16 +74,31 @@ export const endpoints = {
 }
 
 export const authApis = (accessToken = null) => {
-    const token = accessToken || cookies.load('token') || localStorage.getItem("token");
-
-    return axios.create({
+    const token = accessToken || cookies.load("token") || localStorage.getItem("token");
+    const api = axios.create({
         baseURL: API_BASE_URL,
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
-    })
-}
+        headers: token ? { Authorization: "Bearer " + token } : {},
+    });
 
+    api.interceptors.response.use(
+        response => response,
+        error => {
+            if (error.response?.status === 401) {
+                clearAuthSession();
+
+                if (window.location.pathname !== "/login" && !redirectingAfterUnauthorized) {
+                    redirectingAfterUnauthorized = true;
+                    const currentLocation = window.location.pathname + window.location.search;
+                    window.location.replace(getLoginRedirect(currentLocation));
+                }
+            }
+
+            return Promise.reject(error);
+        }
+    );
+
+    return api;
+};
 export default axios.create({
     baseURL: API_BASE_URL
 })

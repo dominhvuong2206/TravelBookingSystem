@@ -15,8 +15,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 public class JwtFilter implements Filter {
     private final UserDetailsService userDetailsService;
-    public JwtFilter(UserDetailsService userDetailsService) {
+    private final JwtUtils jwtUtils;
+
+    public JwtFilter(UserDetailsService userDetailsService, JwtUtils jwtUtils) {
         this.userDetailsService = userDetailsService;
+        this.jwtUtils = jwtUtils;
     }
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -30,7 +33,7 @@ public class JwtFilter implements Filter {
             String token = header.substring(7);
             String username = null;
             try {
-                username = JwtUtils.validateTokenAndGetUsername(token);
+                username = this.jwtUtils.validateTokenAndGetUsername(token);
             } catch (Exception e) {
                 System.err.println(e.getMessage());
             }

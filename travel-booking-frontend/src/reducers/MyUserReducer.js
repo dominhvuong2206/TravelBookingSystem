@@ -1,15 +1,5 @@
 import cookies from 'react-cookies'
-import { AUTH_COOKIE_PATHS } from '../utils/authUtils';
-
-const removeAuthCookies = () => {
-    cookies.remove('token');
-    cookies.remove('user');
-
-    for (let path of AUTH_COOKIE_PATHS) {
-        cookies.remove('token', { path });
-        cookies.remove('user', { path });
-    }
-};
+import { clearAuthSession } from '../utils/authUtils';
 
 
 const MyUserReducer = (current, action) => {
@@ -18,7 +8,7 @@ const MyUserReducer = (current, action) => {
             const user = action.payload.user || action.payload;
             const token = action.payload.token;
 
-            removeAuthCookies();
+            clearAuthSession();
 
             if (token) {
                 cookies.save("token", token, { path: "/" });
@@ -38,9 +28,7 @@ const MyUserReducer = (current, action) => {
             return user;
         }
         case "LOGOUT":
-            removeAuthCookies();
-            localStorage.removeItem("token");
-            localStorage.removeItem("user");
+            clearAuthSession();
             return null;
         default:
             return current;

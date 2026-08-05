@@ -14,9 +14,9 @@ A full-stack travel marketplace that connects travelers with service providers. 
 | Application | URL | Status |
 |---|---|---|
 | React frontend | [AWS S3 website](http://travel-booking-dmv.s3-website-ap-southeast-1.amazonaws.com/) | Online |
-| REST API | Koyeb URL will be added after migration | Deployment in progress |
+| REST API | [Render web service](https://travel-booking-backend-f6og.onrender.com/TravelBookingSystem/api/categories) | Online |
 
-> The frontend is online, but API-dependent features will remain unavailable until the backend migration from Railway to Koyeb is complete.
+> The backend uses a free Render instance and may spin down after a period of inactivity. The first request after an idle period can take up to a minute while the service starts.
 
 ## Project Highlights
 
@@ -65,7 +65,7 @@ The project uses a decoupled client-server architecture. The React single-page a
 ```mermaid
 flowchart LR
     U[User Browser] --> F[React SPA<br/>AWS S3]
-    F -->|REST / JSON + JWT| B[Spring MVC API<br/>Tomcat / Koyeb]
+    F -->|REST / JSON + JWT| B[Spring MVC API<br/>Tomcat / Render]
     B -->|Hibernate ORM| D[(MySQL<br/>Aiven)]
     B --> C[Cloudinary]
     B --> P[Payment Sandboxes]
@@ -96,7 +96,7 @@ HTTP Request
 | Payments | Stripe, PayPal, MoMo, ZaloPay sandbox APIs |
 | Testing | JUnit 5, Jest, React Testing Library |
 | Build and runtime | Maven, npm, Docker, Tomcat 10 |
-| CI/CD and hosting | GitHub Actions, AWS S3, Koyeb, Aiven MySQL |
+| CI/CD and hosting | GitHub Actions, AWS S3, Render, Aiven MySQL |
 
 ## Repository Structure
 
@@ -324,21 +324,23 @@ GitHub Actions runs the same backend verification, frontend tests, and productio
 
 ## Production Deployment
 
-The planned portfolio deployment is:
+The live portfolio deployment is:
 
 ```text
 React frontend  -> AWS S3 static website hosting
-Spring MVC API  -> Koyeb Docker web service
+Spring MVC API  -> Render Docker web service
 MySQL database  -> Aiven for MySQL
 ```
 
-### Backend on Koyeb
+### Backend on Render
 
 ```text
-Builder:              Dockerfile
-Work directory:       travel-booking-backend
-Dockerfile location:  Dockerfile
-Exposed port:         8080 / HTTP
+Service type:          Web Service
+Runtime:               Docker
+Branch:                main
+Root directory:        travel-booking-backend
+Dockerfile path:       ./Dockerfile
+Health check path:     /TravelBookingSystem/api/categories
 ```
 
 For Aiven, provide a TLS-enabled database URL:
@@ -350,7 +352,7 @@ HIBERNATE_CONNECTION_URL=jdbc:mysql://<HOST>:<PORT>/travelbookingdb?sslMode=REQU
 The deployed API URL includes the WAR context path:
 
 ```text
-https://<koyeb-domain>/TravelBookingSystem/api/
+https://travel-booking-backend-f6og.onrender.com/TravelBookingSystem/api/
 ```
 
 ### Frontend on AWS S3
@@ -358,7 +360,7 @@ https://<koyeb-domain>/TravelBookingSystem/api/
 Create `travel-booking-frontend/.env.production`:
 
 ```dotenv
-REACT_APP_API_BASE_URL=https://<koyeb-domain>/TravelBookingSystem/api/
+REACT_APP_API_BASE_URL=https://travel-booking-backend-f6og.onrender.com/TravelBookingSystem/api/
 ```
 
 Build and upload the static application:

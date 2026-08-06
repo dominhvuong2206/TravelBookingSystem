@@ -1,4 +1,5 @@
 package com.dmv.configs;
+
 import java.util.Properties;
 import javax.sql.DataSource;
 import static org.hibernate.cfg.JdbcSettings.DIALECT;
@@ -17,14 +18,16 @@ import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 public class HibernateConfigs {
     @Autowired
     private Environment env;
+
     @Bean
     public LocalSessionFactoryBean getSessionFactory() {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
-        sessionFactory.setPackagesToScan(new String[]{"com.dmv.pojo"});
+        sessionFactory.setPackagesToScan(new String[] { "com.dmv.pojo" });
         sessionFactory.setDataSource(dataSource());
         sessionFactory.setHibernateProperties(hibernateProperties());
         return sessionFactory;
     }
+
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
@@ -34,6 +37,7 @@ public class HibernateConfigs {
         dataSource.setPassword(databasePassword());
         return dataSource;
     }
+
     private Properties hibernateProperties() {
         Properties props = new Properties();
         props.put(DIALECT, config("hibernate.dialect"));
@@ -43,6 +47,7 @@ public class HibernateConfigs {
         props.put("hibernate.connection.useUnicode", "true");
         return props;
     }
+
     private String databaseUrl() {
         String url = config("hibernate.connection.url");
         if (url != null && !url.isBlank() && !url.contains("localhost"))
@@ -53,32 +58,38 @@ public class HibernateConfigs {
         if (host != null && !host.isBlank() && database != null && !database.isBlank()) {
             if (port == null || port.isBlank())
                 port = "3306";
-            return String.format("jdbc:mysql://%s:%s/%s?useUnicode=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC",
+            return String.format(
+                    "jdbc:mysql://%s:%s/%s?useUnicode=true&characterEncoding=UTF-8&allowPublicKeyRetrieval=true&useSSL=true&requireSSL=true&verifyServerCertificate=false&serverTimezone=UTC",
                     host, port, database);
         }
         return url;
     }
+
     private String databaseUsername() {
         String username = env("MYSQLUSER");
         if (username == null || username.isBlank())
             username = config("hibernate.connection.username");
         return username;
     }
+
     private String databasePassword() {
         String password = env("MYSQLPASSWORD");
         if (password == null)
             password = config("hibernate.connection.password");
         return password;
     }
+
     private String config(String name) {
         String value = env(name.toUpperCase().replace('.', '_'));
         if (value == null || value.isBlank())
             value = env.getProperty(name);
         return value;
     }
+
     private String env(String name) {
         return System.getenv(name);
     }
+
     @Bean
     public HibernateTransactionManager transactionManager() {
         HibernateTransactionManager transactionManager = new HibernateTransactionManager();
